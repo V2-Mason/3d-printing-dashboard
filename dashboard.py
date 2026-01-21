@@ -9,7 +9,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import import datetime, timedelta
+from datetime import datetime, timedelta
 import numpy as np
 
 # Import custom emotion charts
