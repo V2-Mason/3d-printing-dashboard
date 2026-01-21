@@ -126,13 +126,12 @@ def create_emotion_frequency_bar(emotion_data):
             xanchor='center'
         ),
         xaxis=dict(
-            title="提及次数 (Mentions)",
-            titlefont=dict(color='white'),
+            title=dict(text="提及次数 (Mentions)", font=dict(color='white')),
             tickfont=dict(color='white'),
             gridcolor='rgba(255, 255, 255, 0.1)'
         ),
         yaxis=dict(
-            titlefont=dict(color='white'),
+            title=dict(font=dict(color='white')),
             tickfont=dict(size=12, color='white'),
             gridcolor='rgba(255, 255, 255, 0.1)'
         ),
@@ -218,16 +217,14 @@ def create_emotion_opportunity_matrix(emotion_data):
             xanchor='center'
         ),
         xaxis=dict(
-            title="情绪强度 (Emotion Intensity)",
+            title=dict(text="情绪强度 (Emotion Intensity)", font=dict(color='white')),
             range=[0, 10],
-            titlefont=dict(color='white'),
             tickfont=dict(color='white'),
             gridcolor='rgba(255, 255, 255, 0.1)'
         ),
         yaxis=dict(
-            title="商业潜力 (Commercial Potential)",
+            title=dict(text="商业潜力 (Commercial Potential)", font=dict(color='white')),
             range=[0, 10],
-            titlefont=dict(color='white'),
             tickfont=dict(color='white'),
             gridcolor='rgba(255, 255, 255, 0.1)'
         ),
@@ -279,14 +276,13 @@ def create_emotion_score_waterfall(product_name="3D打印制鞋"):
             xanchor='center'
         ),
         xaxis=dict(
-            titlefont=dict(color='white'),
+            title=dict(font=dict(color='white')),
             tickfont=dict(size=12, color='white'),
             gridcolor='rgba(255, 255, 255, 0.1)'
         ),
         yaxis=dict(
-            title="分数 (Score)",
+            title=dict(text="分数 (Score)", font=dict(color='white')),
             range=[0, 100],
-            titlefont=dict(color='white'),
             tickfont=dict(color='white'),
             gridcolor='rgba(255, 255, 255, 0.1)'
         ),
