@@ -429,7 +429,7 @@ def main():
                 yaxis_title='产品数量',
                 showlegend=False
             )
-            st.plotly_chart(fig_score, use_container_width=True)
+            st.plotly_chart(fig_score, use_container_width=True, key='fig_score_1')
             
             # 类别分布
             st.markdown("#### 产品类别分布")
@@ -440,7 +440,7 @@ def main():
                 title='产品类别占比',
                 color_discrete_sequence=px.colors.qualitative.Set3
             )
-            st.plotly_chart(fig_category, use_container_width=True)
+            st.plotly_chart(fig_category, use_container_width=True, key='fig_category_1')
         
         with col2:
             # 浏览量 vs 互动率
@@ -459,7 +459,7 @@ def main():
                 xaxis_title='浏览量',
                 yaxis_title='互动率 (%)'
             )
-            st.plotly_chart(fig_scatter, use_container_width=True)
+            st.plotly_chart(fig_scatter, use_container_width=True, key='fig_scatter_1')
             
             # Top 5 产品对比
             st.markdown("#### Top 5 产品对比")
@@ -477,7 +477,7 @@ def main():
                 yaxis_title='总分',
                 xaxis_tickangle=-45
             )
-            st.plotly_chart(fig_bar, use_container_width=True)
+            st.plotly_chart(fig_bar, use_container_width=True, key='fig_bar_1')
     
     # Tab 3: AI洞察（保持不变）
     with tab3:
@@ -554,7 +554,7 @@ def main():
                     xaxis_title='周次',
                     yaxis_title='平均总分'
                 )
-                st.plotly_chart(fig_trend, use_container_width=True)
+                st.plotly_chart(fig_trend, use_container_width=True, key='fig_trend_1')
                 
                 col1, col2 = st.columns(2)
                 
@@ -569,7 +569,7 @@ def main():
                         title='各周总浏览量变化',
                         color_discrete_sequence=['#4CAF50']
                     )
-                    st.plotly_chart(fig_views, use_container_width=True)
+                    st.plotly_chart(fig_views, use_container_width=True, key='fig_views_1')
                 
                 with col2:
                     # 互动率趋势
@@ -582,7 +582,7 @@ def main():
                         title='各周平均互动率变化',
                         color_discrete_sequence=['#FF6B6B']
                     )
-                    st.plotly_chart(fig_engagement, use_container_width=True)
+                    st.plotly_chart(fig_engagement, use_container_width=True, key='fig_engagement_1')
                 
                 # 类别趋势
                 st.markdown("#### 产品类别趋势")
@@ -595,7 +595,7 @@ def main():
                     title='各类别产品数量变化',
                     markers=True
                 )
-                st.plotly_chart(fig_category_trend, use_container_width=True)
+                st.plotly_chart(fig_category_trend, use_container_width=True, key='fig_category_trend_1')
             else:
                 st.info("暂无历史数据。随着周次累积，这里将显示历史趋势分析。")
         else:
@@ -634,7 +634,7 @@ def main():
                 yaxis_title='出现次数',
                 xaxis_tickangle=-45
             )
-            st.plotly_chart(fig_emotion_dist, use_container_width=True)
+            st.plotly_chart(fig_emotion_dist, use_container_width=True, key='fig_emotion_dist_1')
         
         with col2:
             st.markdown("#### 情绪与产品评分关系")
@@ -651,7 +651,7 @@ def main():
                 xaxis_title='平均产品评分',
                 yaxis_title='情绪出现次数'
             )
-            st.plotly_chart(fig_emotion_score, use_container_width=True)
+            st.plotly_chart(fig_emotion_score, use_container_width=True, key='fig_emotion_score_1')
         
         st.divider()
         
@@ -719,7 +719,7 @@ def main():
                 yaxis_title='出现次数',
                 hovermode='x unified'
             )
-            st.plotly_chart(fig_trend, use_container_width=True)
+            st.plotly_chart(fig_trend, use_container_width=True, key='fig_trend_2')
         
         st.divider()
         
@@ -845,7 +845,7 @@ def main():
                 title='各竞争对手市场份额',
                 color_discrete_sequence=px.colors.sequential.Blues_r
             )
-            st.plotly_chart(fig_market_share, use_container_width=True)
+            st.plotly_chart(fig_market_share, use_container_width=True, key='fig_market_share_1')
         
         with col2:
             st.markdown("#### 价格定位对比")
@@ -862,7 +862,7 @@ def main():
                 yaxis_title='平均价格 ($)',
                 xaxis_tickangle=-45
             )
-            st.plotly_chart(fig_price, use_container_width=True)
+            st.plotly_chart(fig_price, use_container_width=True, key='fig_price_1')
         
         st.divider()
         
@@ -912,7 +912,7 @@ def main():
             xaxis_title='平均价格 ($)',
             yaxis_title='市场份额 (%)'
         )
-        st.plotly_chart(fig_matrix, use_container_width=True)
+        st.plotly_chart(fig_matrix, use_container_width=True, key='fig_matrix_1')
         
         st.markdown("""
         <div class="insight-box">
@@ -1087,7 +1087,7 @@ def main():
                 color_discrete_sequence=['#2196F3']
             )
             fig_trend.update_layout(hovermode='x unified')
-            st.plotly_chart(fig_trend, use_container_width=True)
+            st.plotly_chart(fig_trend, use_container_width=True, key='fig_trend_3')
         
         with col2:
             st.markdown("#### 🎯 平台表现")
@@ -1105,7 +1105,7 @@ def main():
                 showlegend=False,
                 title=f'{product["name"]}在各平台的表现'
             )
-            st.plotly_chart(fig_radar, use_container_width=True)
+            st.plotly_chart(fig_radar, use_container_width=True, key='fig_radar_1')
         
         st.divider()
         
@@ -1125,7 +1125,7 @@ def main():
                 color='比例',
                 color_continuous_scale='Blues'
             )
-            st.plotly_chart(fig_emotion, use_container_width=True)
+            st.plotly_chart(fig_emotion, use_container_width=True, key='fig_emotion_1')
         
         with col2:
             st.markdown("#### 🏷️ 关键词标签")
@@ -1198,7 +1198,7 @@ def main():
                 title='各竞争对手市场份额',
                 color_discrete_sequence=px.colors.sequential.Blues_r
             )
-            st.plotly_chart(fig_market_share, use_container_width=True)
+            st.plotly_chart(fig_market_share, use_container_width=True, key='fig_market_share_2')
         
         with col2:
             st.markdown("#### 价格定位对比")
@@ -1215,7 +1215,7 @@ def main():
                 yaxis_title='平均价格 ($)',
                 xaxis_tickangle=-45
             )
-            st.plotly_chart(fig_price, use_container_width=True)
+            st.plotly_chart(fig_price, use_container_width=True, key='fig_price_2')
         
         st.divider()
         
@@ -1265,7 +1265,7 @@ def main():
             xaxis_title='平均价格 ($)',
             yaxis_title='市场份额 (%)'
         )
-        st.plotly_chart(fig_matrix, use_container_width=True)
+        st.plotly_chart(fig_matrix, use_container_width=True, key='fig_matrix_2')
         
         st.markdown("""
         <div class="insight-box">
@@ -1353,7 +1353,7 @@ def main():
                 title='总预算分配 ($9,000)',
                 color_discrete_sequence=px.colors.sequential.Blues_r
             )
-            st.plotly_chart(fig_budget, use_container_width=True)
+            st.plotly_chart(fig_budget, use_container_width=True, key='fig_budget_1')
         
         with col2:
             st.markdown("##### 预算明细")
