@@ -1406,7 +1406,7 @@ def main():
         
         # === 新增：四象限矩阵分析 ===
         if MATRIX_FIX_AVAILABLE:
-            st.markdown(" #### 📊 市场定位矩阵（四象限分析）")
+            st.markdown("#### 📊 市场定位矩阵（四象限分析）")
             st.markdown("""
             <div class="insight-box">
             <strong>💡 图表说明</strong><br>
@@ -1429,7 +1429,7 @@ def main():
             st.divider()
         
         # 竞争对手详细分析
-        st.markdown(" #### 竞争对手详细分析")        
+        st.markdown("#### 竞争对手详细分析")        
         for _, competitor in competitor_df.iterrows():
             with st.expander(f"**{competitor['name']}** - 市场份额: {competitor['market_share']:.1f}%"):
                 col1, col2 = st.columns(2)
