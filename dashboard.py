@@ -9,25 +9,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import numpy as np
 from pathlib import Path
 import glob
-
-# Import custom emotion charts
-try:
-    from emotion_charts import (
-        create_emotion_radar_chart,
-        create_emotion_frequency_bar,
-        create_emotion_opportunity_matrix,
-        create_emotion_score_waterfall,
-        generate_sample_emotion_data
-    )
-    EMOTION_CHARTS_AVAILABLE = True
-except ImportError:
-    EMOTION_CHARTS_AVAILABLE = False
-    print("Warning: emotion_charts module not found")
-
+from datetime import datetime
+import numpy as np
 
 # 页面配置
 st.set_page_config(
@@ -352,20 +337,21 @@ def main():
     
     # 标签页（新增3个Tab）
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
-        "📊 执行摘要",  # 移到第一位
+        "📊 执行摘要",   # 移到第一位
         "📋 产品排名",
-        "🎯 产品分析",
-        "💭 情绪分析",
-        "🎭 竞争分析",
         "📊 数据分析",
         "🤖 AI洞察",
         "📈 历史趋势",
+        "💭 情绪分析",
+        "🎯 产品分析",
+        "🎭 竞争分析",
         "📋 行动计划"
     ])
     
     # Tab 1: 产品排名表格（保持不变）
+
     # Tab 1: 执行摘要
-    with tab9:
+    with tab1:
         st.subheader("📊 执行摘要")
         
         st.markdown("""
@@ -580,15 +566,9 @@ def main():
         """, unsafe_allow_html=True)
     
     # 页脚
-    st.divider()
-    st.caption("🖨️ 3D打印市场情报系统（完整增强版）| 数据来源: TikTok | AI分析: OpenAI GPT-4")
-    st.caption("💡 新增功能：情绪分析、产品分析、竞争分析、行动计划、执行摘要")
-
-if __name__ == "__main__":
-    main()
 
     # Tab 2: 产品排名
-    with tab1:
+    with tab2:
         st.subheader("🏆 产品排名表")
         
         # 显示选项
@@ -649,8 +629,81 @@ if __name__ == "__main__":
     
     # Tab 2: 数据分析（保持不变）
 
-    # Tab 3: 产品分析
+    # Tab 3: 数据分析
     with tab3:
+        st.subheader("📊 数据可视化分析")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # 分数分布
+            st.markdown("#### 总分分布")
+            fig_score = px.histogram(
+                filtered_df,
+                x='total_score',
+                nbins=20,
+                title='产品总分分布',
+                color_discrete_sequence=['#2196F3']
+            )
+            fig_score.update_layout(
+                xaxis_title='总分',
+                yaxis_title='产品数量',
+                showlegend=False
+            )
+            st.plotly_chart(fig_score, use_container_width=True, key='fig_score_1')
+            
+            # 类别分布
+            st.markdown("#### 产品类别分布")
+            category_counts = filtered_df['product_category'].value_counts()
+            fig_category = px.pie(
+                values=category_counts.values,
+                names=category_counts.index,
+                title='产品类别占比',
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
+            st.plotly_chart(fig_category, use_container_width=True, key='fig_category_1')
+        
+        with col2:
+            # 浏览量 vs 互动率
+            st.markdown("#### 浏览量 vs 互动率")
+            fig_scatter = px.scatter(
+                filtered_df,
+                x='views',
+                y='engagement_rate',
+                size='total_score',
+                color='product_category',
+                hover_data=['product_name'],
+                title='浏览量与互动率关系',
+                color_discrete_sequence=px.colors.qualitative.Bold
+            )
+            fig_scatter.update_layout(
+                xaxis_title='浏览量',
+                yaxis_title='互动率 (%)'
+            )
+            st.plotly_chart(fig_scatter, use_container_width=True, key='fig_scatter_1')
+            
+            # Top 5 产品对比
+            st.markdown("#### Top 5 产品对比")
+            top5 = filtered_df.nsmallest(5, 'product_rank')
+            fig_bar = go.Figure()
+            fig_bar.add_trace(go.Bar(
+                name='总分',
+                x=top5['product_name'].str[:30],
+                y=top5['total_score'],
+                marker_color='#2196F3'
+            ))
+            fig_bar.update_layout(
+                title='Top 5 产品总分对比',
+                xaxis_title='产品',
+                yaxis_title='总分',
+                xaxis_tickangle=-45
+            )
+            st.plotly_chart(fig_bar, use_container_width=True, key='fig_bar_1')
+    
+    # Tab 3: AI洞察（保持不变）
+
+    # Tab 4: AI洞察
+    with tab4:
         if show_ai_analysis:
             st.subheader("🤖 AI深度分析")
             
@@ -702,8 +755,8 @@ if __name__ == "__main__":
     
     # Tab 4: 历史趋势（保持不变）
 
-    # Tab 4: 情绪分析
-    with tab4:
+    # Tab 5: 历史趋势
+    with tab5:
         if show_trends:
             st.subheader("📈 历史趋势分析")
             
@@ -775,8 +828,8 @@ if __name__ == "__main__":
     
     # ===== 新增 Tab 5: 情绪分析 =====
 
-    # Tab 5: 竞争分析
-    with tab5:
+    # Tab 6: 情绪分析
+    with tab6:
         st.subheader("💭 情绪智能分析")
         
         st.markdown("""
@@ -993,7 +1046,9 @@ if __name__ == "__main__":
             """, unsafe_allow_html=True)
     
     # ===== 新增 Tab 6: 竞争分析 =====
-    with tab6:
+
+    # Tab 7: 产品分析
+    with tab7:
         st.subheader("🎯 推荐产品详细分析")
         
         st.markdown("""
@@ -1241,8 +1296,8 @@ if __name__ == "__main__":
     
     # ===== 新增 Tab 7: 竞争分析 =====
 
-    # Tab 6: 数据分析
-    with tab6:
+    # Tab 8: 竞争分析
+    with tab8:
         st.subheader("🎭 竞争对手分析")
         
         st.markdown("""
@@ -1349,116 +1404,8 @@ if __name__ == "__main__":
     
     # ===== 新增 Tab 6: 产品分析 =====
 
-    # Tab 7: AI洞察
-    with tab7:
-        st.subheader("🎭 竞争对手分析")
-        
-        st.markdown("""
-        <div class="insight-box">
-        <strong>💡 市场格局</strong><br>
-        当前3D打印定制市场竞争激烈，主要竞争对手各有特色。
-        了解竞争对手的优劣势，有助于制定差异化策略。
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # 生成竞争对手数据
-        competitor_df = generate_competitor_data()
-        
-        # 市场份额
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("#### 市场份额分布")
-            fig_market_share = px.pie(
-                competitor_df,
-                values='market_share',
-                names='name',
-                title='各竞争对手市场份额',
-                color_discrete_sequence=px.colors.sequential.Blues_r
-            )
-            st.plotly_chart(fig_market_share, use_container_width=True, key='fig_market_share_2')
-        
-        with col2:
-            st.markdown("#### 价格定位对比")
-            fig_price = px.bar(
-                competitor_df.sort_values('avg_price', ascending=False),
-                x='name',
-                y='avg_price',
-                title='各竞争对手平均价格',
-                color='avg_price',
-                color_continuous_scale='Blues'
-            )
-            fig_price.update_layout(
-                xaxis_title='竞争对手',
-                yaxis_title='平均价格 ($)',
-                xaxis_tickangle=-45
-            )
-            st.plotly_chart(fig_price, use_container_width=True, key='fig_price_2')
-        
-        st.divider()
-        
-        # 竞争对手详细分析
-        st.markdown("#### 竞争对手详细分析")
-        
-        for _, competitor in competitor_df.iterrows():
-            with st.expander(f"**{competitor['name']}** - 市场份额: {competitor['market_share']:.1f}%"):
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown(f"""
-                    <div class="competitor-card">
-                    <strong>📊 基本信息</strong><br>
-                    • 市场份额: {competitor['market_share']:.1f}%<br>
-                    • 平均价格: ${competitor['avg_price']:.2f}<br>
-                    • 竞争策略: {competitor['strategy']}
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    st.success(f"**✅ 优势**: {competitor['strength']}")
-                
-                with col2:
-                    st.error(f"**⚠️ 劣势**: {competitor['weakness']}")
-                    
-                    # 差异化建议
-                    st.info(f"""
-                    **💡 差异化机会**:
-                    针对{competitor['name']}的劣势，我们可以在{competitor['weakness']}方面建立优势。
-                    """)
-        
-        st.divider()
-        
-        # 竞争策略矩阵
-        st.markdown("#### 市场定位矩阵")
-        
-        fig_matrix = px.scatter(
-            competitor_df,
-            x='avg_price',
-            y='market_share',
-            size='market_share',
-            color='name',
-            title='价格 vs 市场份额定位矩阵',
-            hover_data=['strategy']
-        )
-        fig_matrix.update_layout(
-            xaxis_title='平均价格 ($)',
-            yaxis_title='市场份额 (%)'
-        )
-        st.plotly_chart(fig_matrix, use_container_width=True, key='fig_matrix_2')
-        
-        st.markdown("""
-        <div class="insight-box">
-        <strong>🎯 我们的定位建议</strong><br>
-        • <strong>目标市场</strong>: 中高端市场（$35-45价格区间）<br>
-        • <strong>差异化策略</strong>: 快速交付 + 高品质 + 合理价格<br>
-        • <strong>突破口</strong>: 填补“高品质+快速交付”的市场空白<br>
-        • <strong>目标份额</strong>: 第一年争取5-8%市场份额
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # ===== 新增 Tab 8: 行动计划 =====
-
-    # Tab 8: 历史趋势
-    with tab8:
+    # Tab 9: 行动计划
+    with tab9:
         st.subheader("📋 8周行动计划")
         
         st.markdown("""
@@ -1625,75 +1572,10 @@ if __name__ == "__main__":
     
     # ===== 新增 Tab 9: 执行摘要 =====
 
-    # Tab 9: 行动计划
-    with tab2:
-        st.subheader("📊 数据可视化分析")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # 分数分布
-            st.markdown("#### 总分分布")
-            fig_score = px.histogram(
-                filtered_df,
-                x='total_score',
-                nbins=20,
-                title='产品总分分布',
-                color_discrete_sequence=['#2196F3']
-            )
-            fig_score.update_layout(
-                xaxis_title='总分',
-                yaxis_title='产品数量',
-                showlegend=False
-            )
-            st.plotly_chart(fig_score, use_container_width=True, key='fig_score_1')
-            
-            # 类别分布
-            st.markdown("#### 产品类别分布")
-            category_counts = filtered_df['product_category'].value_counts()
-            fig_category = px.pie(
-                values=category_counts.values,
-                names=category_counts.index,
-                title='产品类别占比',
-                color_discrete_sequence=px.colors.qualitative.Set3
-            )
-            st.plotly_chart(fig_category, use_container_width=True, key='fig_category_1')
-        
-        with col2:
-            # 浏览量 vs 互动率
-            st.markdown("#### 浏览量 vs 互动率")
-            fig_scatter = px.scatter(
-                filtered_df,
-                x='views',
-                y='engagement_rate',
-                size='total_score',
-                color='product_category',
-                hover_data=['product_name'],
-                title='浏览量与互动率关系',
-                color_discrete_sequence=px.colors.qualitative.Bold
-            )
-            fig_scatter.update_layout(
-                xaxis_title='浏览量',
-                yaxis_title='互动率 (%)'
-            )
-            st.plotly_chart(fig_scatter, use_container_width=True, key='fig_scatter_1')
-            
-            # Top 5 产品对比
-            st.markdown("#### Top 5 产品对比")
-            top5 = filtered_df.nsmallest(5, 'product_rank')
-            fig_bar = go.Figure()
-            fig_bar.add_trace(go.Bar(
-                name='总分',
-                x=top5['product_name'].str[:30],
-                y=top5['total_score'],
-                marker_color='#2196F3'
-            ))
-            fig_bar.update_layout(
-                title='Top 5 产品总分对比',
-                xaxis_title='产品',
-                yaxis_title='总分',
-                xaxis_tickangle=-45
-            )
-            st.plotly_chart(fig_bar, use_container_width=True, key='fig_bar_1')
-    
-    # Tab 3: AI洞察（保持不变）
+    # 页脚
+    st.divider()
+    st.caption("🖨️ 3D打印市场情报系统（完整增强版）| 数据来源: TikTok | AI分析: OpenAI GPT-4")
+    st.caption("💡 新增功能：情绪分析、产品分析、竞争分析、行动计划、执行摘要")
+
+if __name__ == "__main__":
+    main()
