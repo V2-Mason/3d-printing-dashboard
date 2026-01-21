@@ -873,8 +873,7 @@ def main():
             
             # 1. 雷达图 - 12种情绪强度分布
             st.markdown("#### 1️⃣ 12种情绪强度分布雷达图")
-            week3_data = sample_data['week3_intensity']
-            week4_data = sample_data['week4_intensity']
+            week3_data, week4_data = sample_data['radar']  # Unpack tuple
             fig_radar = create_emotion_radar_chart(week3_data, week4_data)
             st.plotly_chart(fig_radar, use_container_width=True, key='emotion_radar_pro')
             
@@ -884,13 +883,13 @@ def main():
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("#### 2️⃣ 情绪频率排名")
-                fig_bar = create_emotion_frequency_bar(sample_data['emotion_frequency'])
+                fig_bar = create_emotion_frequency_bar(sample_data['frequency'])
                 st.plotly_chart(fig_bar, use_container_width=True, key='emotion_bar_pro')
             
             # 3. 气泡矩阵 - 情绪机会分析
             with col2:
                 st.markdown("#### 3️⃣ 情绪机会矩阵")
-                fig_matrix = create_emotion_opportunity_matrix(sample_data['emotion_opportunity'])
+                fig_matrix = create_emotion_opportunity_matrix(sample_data['matrix'])
                 st.plotly_chart(fig_matrix, use_container_width=True, key='emotion_matrix_pro')
             
             st.divider()
