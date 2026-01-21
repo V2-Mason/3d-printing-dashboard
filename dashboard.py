@@ -14,6 +14,21 @@ import glob
 from datetime import datetime
 import numpy as np
 
+# Import data manager for Google Drive integration
+try:
+    from data_manager import (
+        get_available_weeks,
+        load_week_data,
+        load_week_metadata,
+        upload_week_data,
+        get_week_summary,
+        extract_week_number_from_filename
+    )
+    DATA_MANAGER_AVAILABLE = True
+except ImportError:
+    DATA_MANAGER_AVAILABLE = False
+    st.warning("⚠️ data_manager.py 未找到，使用本地文件")
+
 # Import custom emotion charts module
 try:
     from emotion_charts import (
@@ -242,29 +257,44 @@ def main():
     with st.sidebar:
         st.header("⚙️ 配置选项")
         
-        # 数据源选择
-        reports_dir = Path('reports')
-        csv_files = sorted(glob.glob(str(reports_dir / 'All_Data_Week_*.csv')), reverse=True)
-        
-        if not csv_files:
-            st.error("未找到数据文件！请先运行 run_weekly_report_v3.py")
-            return
-        
-        # 提取周次信息
-        week_options = {}
-        for file in csv_files:
-            filename = Path(file).name
-            # 从文件名提取周次号
-            week_num = filename.split('_')[3].replace('.csv', '')
-            week_options[f"第 {week_num} 周"] = file
-        
-        selected_week = st.selectbox(
-            "选择周次",
-            options=list(week_options.keys()),
-            index=0
-        )
-        
-        data_file = week_options[selected_week]
+        # 数据源选择 - 使用Google Drive
+        if DATA_MANAGER_AVAILABLE:
+            available_weeks = get_available_weeks()
+            if not available_weeks:
+                st.error("未找到数据！请上传数据文件")
+                return
+            
+            week_options = [f"第 {week:02d} 周" for week in available_weeks]
+            selected_week_str = st.selectbox(
+                "选择周次",
+                options=week_options,
+                index=len(week_options)-1  # 默认选择最新周次
+            )
+            
+            # 提取周次编号
+            selected_week_num = int(selected_week_str.split()[1])
+        else:
+            # 退回到本地文件加载
+            reports_dir = Path('reports')
+            csv_files = sorted(glob.glob(str(reports_dir / 'All_Data_Week_*.csv')), reverse=True)
+            
+            if not csv_files:
+                st.error("未找到数据文件！")
+                return
+            
+            week_options = {}
+            for file in csv_files:
+                filename = Path(file).name
+                week_num = filename.split('_')[3].replace('.csv', '')
+                week_options[f"第 {week_num} 周"] = file
+            
+            selected_week_str = st.selectbox(
+                "选择周次",
+                options=list(week_options.keys()),
+                index=0
+            )
+            data_file = week_options[selected_week_str]
+            selected_week_num = int(selected_week_str.split()[1])
         
         st.divider()
         
@@ -272,7 +302,13 @@ def main():
         st.subheader("🔍 数据筛选")
         
         # 加载数据
-        df = load_data(data_file)
+        if DATA_MANAGER_AVAILABLE:
+            df = load_week_data(selected_week_num)
+            if df is None:
+                st.error(f"加载第 {selected_week_num} 周数据失败！")
+                return
+        else:
+            df = load_data(data_file)
         
         if df is None:
             return
@@ -298,9 +334,58 @@ def main():
         
         st.divider()
         
+        # 数据管理
+        if DATA_MANAGER_AVAILABLE:
+            st.subheader("📤 数据管理")
+            
+            # 文件上传
+            uploaded_file = st.file_uploader(
+                "上传新周次数据",
+                type=['csv'],
+                help="上传 All_Data_Week_XX.csv 文件"
+            )
+            
+            if uploaded_file is not None:
+                # 自动提取周次编号
+                week_num = extract_week_number_from_filename(uploaded_file.name)
+                
+                if week_num is None:
+                    # 手动输入周次
+                    week_num = st.number_input(
+                        "周次编号",
+                        min_value=1,
+                        max_value=52,
+                        value=len(available_weeks) + 1 if available_weeks else 1,
+                        help="请输入周次编号（例如：5）"
+                    )
+                else:
+                    st.info(f"检测到周次：第 {week_num:02d} 周")
+                
+                # 备注
+                notes = st.text_input(
+                    "备注（可选）",
+                    placeholder="例如：重点关注鞋类产品"
+                )
+                
+                # 上传按钮
+                if st.button("💾 保存到 Google Drive", type="primary"):
+                    with st.spinner("正在上传..."):
+                        success = upload_week_data(uploaded_file, week_num, notes)
+                    
+                    if success:
+                        st.success(f"✅ 第 {week_num:02d} 周数据已保存！")
+                        st.balloons()
+                        # 清除缓存并重新加载
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        st.error("❌ 上传失败，请检查文件格式")
+            
+            st.divider()
+        
         # 更新信息
         st.caption(f"📅 最后更新: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-        st.caption("💡 数据每周自动更新")
+        st.caption("💡 数据保存在 Google Drive")
     
     # 应用筛选
     filtered_df = df.copy()
