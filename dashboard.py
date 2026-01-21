@@ -16,7 +16,7 @@ import numpy as np
 
 # Import data manager for Google Drive integration
 try:
-    from data_manager import (
+    from data_manager_gdrive import (
         get_available_weeks,
         load_week_data,
         load_week_metadata,
@@ -27,7 +27,7 @@ try:
     DATA_MANAGER_AVAILABLE = True
 except ImportError:
     DATA_MANAGER_AVAILABLE = False
-    st.warning("⚠️ data_manager.py 未找到，使用本地文件")
+    st.warning("⚠️ data_manager_gdrive.py 未找到，使用本地文件")
 
 # Import custom emotion charts module
 try:
