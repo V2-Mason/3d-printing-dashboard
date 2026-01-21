@@ -1,0 +1,43 @@
+# Market Intelligence System - Python Dependencies
+# Version: 1.1
+# Date: 2026-01-20
+# Updated: Added all required dependencies for 3-day collection schedule
+
+# Core dependencies
+requests>=2.31.0
+mysql-connector-python>=8.0.33
+pymysql>=1.1.0
+
+# OpenAI
+openai>=1.6.0
+
+# Data Processing
+pandas>=2.1.0
+numpy>=1.26.0
+
+# Google Trends
+pytrends>=4.9.0
+
+# Social Media APIs
+praw>=7.7.0  # Reddit API
+TikTokApi>=6.0.0  # TikTok (unofficial)
+
+# Configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+
+# Utilities
+python-dateutil>=2.8.0
+pytz>=2023.3
+colorlog>=6.8.0
+
+# Rate Limiting & Retry
+ratelimit>=2.2.0
+tenacity>=8.2.0
+
+# Browser Automation (for Meta Ad Library)
+selenium>=4.15.0
+
+# Streamlit Dashboard
+streamlit>=1.31.0
+plotly>=5.18.0
