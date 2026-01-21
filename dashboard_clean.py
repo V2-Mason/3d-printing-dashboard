@@ -14,27 +14,6 @@ import glob
 from datetime import datetime
 import numpy as np
 
-# Import custom emotion charts module
-try:
-    from emotion_charts import (
-        create_emotion_radar_chart,
-        create_emotion_frequency_bar,
-        create_emotion_opportunity_matrix,
-        create_emotion_score_waterfall,
-        generate_sample_emotion_data
-    )
-    EMOTION_CHARTS_AVAILABLE = True
-except ImportError:
-    EMOTION_CHARTS_AVAILABLE = False
-    st.warning("⚠️ emotion_charts.py 未找到，使用默认图表")
-
-# Import matrix visualization module
-try:
-    from matrix_fix import create_quadrant_matrix
-    MATRIX_FIX_AVAILABLE = True
-except ImportError:
-    MATRIX_FIX_AVAILABLE = False
-
 # 页面配置
 st.set_page_config(
     page_title="3D打印市场情报仪表板",
@@ -358,238 +337,19 @@ def main():
     
     # 标签页（新增3个Tab）
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
-        "📊 执行摘要",   # 移到第一位
-        "📋 产品排名",
-        "📊 数据分析",
-        "🤖 AI洞察",
+        "📋 产品排名", 
+        "📊 数据分析", 
+        "🤖 AI洞察", 
         "📈 历史趋势",
-        "💭 情绪分析",
-        "🎯 产品分析",
-        "🎭 竞争分析",
-        "📋 行动计划"
+        "💭 情绪分析",  # 新增
+        "🎯 产品分析",  # 新增
+        "🎭 竞争分析",  # 新增
+        "📋 行动计划",  # 新增
+        "📊 执行摘要"   # 新增
     ])
     
     # Tab 1: 产品排名表格（保持不变）
-
-    # Tab 1: 执行摘要
     with tab1:
-        st.subheader("📊 执行摘要")
-        
-        st.markdown("""
-        <div class="insight-box">
-        <strong>🎯 核心目标</strong><br>
-        基于社交媒体情绪数据和电商平台销售数据，快速识别高潜力产品机会，
-        助力3D打印定制业务实现数据驱动的产品选择和市场策略。
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.divider()
-        
-        # 三大核心洞察
-        st.markdown("### 💡 三大核心洞察")
-        
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>💭 情绪发现</strong><br><br>
-            • <strong>正面情绪占主导</strong>: 兴奋、好奇、满意等正面情绪占总量的65%<br>
-            • <strong>上升最快</strong>: 兴奋情绪4周增长38%，表明用户对创新产品接受度高<br>
-            • <strong>需要关注</strong>: 担忧和困惑情绪主要集中在价格和质量方面<br><br>
-            <em>建议：强化产品质量展示，提供透明的定价说明</em>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>💰 销售发现</strong><br><br>
-            • <strong>Etsy表现最佳</strong>: 增长率32%，用户愿意为定制付费<br>
-            • <strong>热门类别</strong>: 办公用品和数码配件需求旺盛<br>
-            • <strong>平均客单价</strong>: $38，中高端市场潜力大<br><br>
-            <em>建议：优先在Etsy上架，重点开发办公和数码类产品</em>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>🎯 战略建议</strong><br><br>
-            • <strong>快速进入</strong>: 市场处于快速增长期，机会窗口期<br>
-            • <strong>小批量测试</strong>: 8周内完成从设计到上线<br>
-            • <strong>预算控制</strong>: 总预算$9,000，分阶段执行<br><br>
-            <em>建议：立即启动Top 3产品开发</em>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.divider()
-        
-        # 6个KPI
-        st.markdown("### 📊 6大关键指标 (KPI)")
-        
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.metric(
-                "💬 总提及次数",
-                "8,420",
-                "+28.5%",
-                help="过去4周在社交媒体上的总提及次数"
-            )
-        
-        with col2:
-            st.metric(
-                "🚀 平均情绪分数",
-                "44.2",
-                "+3.8",
-                help="正面情绪分数，满分50分"
-            )
-        
-        with col3:
-            st.metric(
-                "📈 增长率",
-                "32.1%",
-                "+5.2%",
-                help="过去4周的平均增长率"
-            )
-        
-        col4, col5, col6 = st.columns(3)
-        
-        with col4:
-            st.metric(
-                "💰 预估营收",
-                "$48,200",
-                "+$12,500",
-                help="基于Top 5产品的预估月营收"
-            )
-        
-        with col5:
-            st.metric(
-                "🎯 转化率",
-                "5.8%",
-                "+1.2%",
-                help="从浏览到购买的平均转化率"
-            )
-        
-        with col6:
-            st.metric(
-                "⭐ 客户满意度",
-                "4.5/5.0",
-                "+0.3",
-                help="平台平均评分"
-            )
-        
-        st.divider()
-        
-        # Top 3产品推荐
-        st.markdown("### 🏆 Top 3 产品推荐")
-        
-        top_products = [
-            {
-                'rank': 1,
-                'name': '迷你桌面收纳盒',
-                'score': 45.2,
-                'growth': 38.5,
-                'revenue': 12500,
-                'reason': '情绪分数最高，办公场景需求旺盛，适合快速进入',
-                'link': 'https://www.etsy.com/search?q=desk+organizer+3d+print'
-            },
-            {
-                'rank': 2,
-                'name': '创意手机支架',
-                'score': 43.8,
-                'growth': 32.1,
-                'revenue': 9800,
-                'reason': 'TikTok平台表现极佳，年轻用户喜爱，定制化需求强',
-                'link': 'https://www.etsy.com/search?q=phone+stand+3d+print'
-            },
-            {
-                'rank': 3,
-                'name': '装饰性墙挂',
-                'score': 42.5,
-                'growth': 28.3,
-                'revenue': 8500,
-                'reason': 'Instagram/Pinterest表现优秀，家居装饰市场稳定',
-                'link': 'https://www.etsy.com/search?q=wall+decor+3d+print'
-            }
-        ]
-        
-        for product in top_products:
-            with st.expander(f"**#{product['rank']} {product['name']}** - 情绪分数: {product['score']}", expanded=(product['rank']==1)):
-                col1, col2 = st.columns([2, 1])
-                
-                with col1:
-                    st.markdown(f"""
-                    **📊 核心指标**
-                    - 情绪分数: **{product['score']}**/50
-                    - 增长率: **{product['growth']}%**
-                    - 预估月营收: **${product['revenue']:,}**
-                    
-                    **✅ 推荐理由**
-                    {product['reason']}
-                    """)
-                    
-                    st.markdown(f"[🔗 查看类似产品]({product['link']})")
-                
-                with col2:
-                    # 进度条
-                    st.markdown("**各项评分**")
-                    st.progress(product['score']/50, text=f"情绪: {product['score']}/50")
-                    st.progress(product['growth']/50, text=f"增长: {product['growth']:.0f}%")
-                    st.progress(min(product['revenue']/15000, 1.0), text=f"营收: ${product['revenue']/1000:.1f}K")
-        
-        st.divider()
-        
-        # 数据解读
-        st.markdown("### 📖 数据解读")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>🔍 如何读懂情绪分数</strong><br><br>
-            情绪分数基于社交媒体用户评论和互动数据，通过AI分析生成：<br><br>
-            • <strong>40-50分</strong>: 极高正面情绪，强烈推荐<br>
-            • <strong>35-40分</strong>: 正面情绪为主，值得尝试<br>
-            • <strong>30-35分</strong>: 中立态度，需谨慎评估<br>
-            • <strong>30分以下</strong>: 负面情绪较多，不建议进入
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>📈 如何读懂增长率</strong><br><br>
-            增长率反映了4周内的趋势变化，帮助判断市场热度：<br><br>
-            • <strong>30%以上</strong>: 快速增长，市场需求旺盛<br>
-            • <strong>15-30%</strong>: 稳定增长，市场潜力大<br>
-            • <strong>0-15%</strong>: 缓慢增长，需要营销推动<br>
-            • <strong>负增长</strong>: 市场需求下降，谨慎进入
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.divider()
-        
-        # 下一步行动
-        st.markdown("""
-        <div class="insight-box">
-        <strong>🚀 立即行动清单</strong><br><br>
-        1. ✅ <strong>确认产品选择</strong>: 从 Top 3 中选择 1-2 个产品启动<br>
-        2. ✅ <strong>联系供应商</strong>: 找到3D打印材料供应商，获取报价<br>
-        3. ✅ <strong>注册平台</strong>: 在 Etsy 和 Amazon 注册卖家账号<br>
-        4. ✅ <strong>开始设计</strong>: 完成产品3D建模和打样<br>
-        5. ✅ <strong>制定计划</strong>: 根据行动计划Tab制定详细时间表<br><br>
-        <strong>💼 预算准备</strong>: $9,000 (分阶段执行)<br>
-        <strong>⏰ 预计周期</strong>: 8周（从设计到上线）
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # 页脚
-
-    # Tab 2: 产品排名
-    with tab2:
         st.subheader("🏆 产品排名表")
         
         # 显示选项
@@ -649,9 +409,7 @@ def main():
         )
     
     # Tab 2: 数据分析（保持不变）
-
-    # Tab 3: 数据分析
-    with tab3:
+    with tab2:
         st.subheader("📊 数据可视化分析")
         
         col1, col2 = st.columns(2)
@@ -722,9 +480,7 @@ def main():
             st.plotly_chart(fig_bar, use_container_width=True, key='fig_bar_1')
     
     # Tab 3: AI洞察（保持不变）
-
-    # Tab 4: AI洞察
-    with tab4:
+    with tab3:
         if show_ai_analysis:
             st.subheader("🤖 AI深度分析")
             
@@ -775,9 +531,7 @@ def main():
             st.info("请在侧边栏启用 '显示AI分析' 选项")
     
     # Tab 4: 历史趋势（保持不变）
-
-    # Tab 5: 历史趋势
-    with tab5:
+    with tab4:
         if show_trends:
             st.subheader("📈 历史趋势分析")
             
@@ -848,9 +602,7 @@ def main():
             st.info("请在侧边栏启用 '显示历史趋势' 选项")
     
     # ===== 新增 Tab 5: 情绪分析 =====
-
-    # Tab 6: 情绪分析
-    with tab6:
+    with tab5:
         st.subheader("💭 情绪智能分析")
         
         st.markdown("""
@@ -863,45 +615,6 @@ def main():
         
         # 生成情绪数据
         emotion_df = generate_emotion_data()
-        
-        # === 新增：专业情绪分析图表 ===
-        if EMOTION_CHARTS_AVAILABLE:
-            st.markdown("### 📊 专业情绪分析图表")
-            
-            # 生成示例数据
-            sample_data = generate_sample_emotion_data()
-            
-            # 1. 雷达图 - 12种情绪强度分布
-            st.markdown("#### 1️⃣ 12种情绪强度分布雷达图")
-            week3_data = sample_data['week3_intensity']
-            week4_data = sample_data['week4_intensity']
-            fig_radar = create_emotion_radar_chart(week3_data, week4_data)
-            st.plotly_chart(fig_radar, use_container_width=True, key='emotion_radar_pro')
-            
-            st.divider()
-            
-            # 2. 水平柱状图 - 情绪频率分布
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("#### 2️⃣ 情绪频率排名")
-                fig_bar = create_emotion_frequency_bar(sample_data['emotion_frequency'])
-                st.plotly_chart(fig_bar, use_container_width=True, key='emotion_bar_pro')
-            
-            # 3. 气泡矩阵 - 情绪机会分析
-            with col2:
-                st.markdown("#### 3️⃣ 情绪机会矩阵")
-                fig_matrix = create_emotion_opportunity_matrix(sample_data['emotion_opportunity'])
-                st.plotly_chart(fig_matrix, use_container_width=True, key='emotion_matrix_pro')
-            
-            st.divider()
-            
-            # 4. 瀑布图 - 情绪得分组成
-            st.markdown("#### 4️⃣ 产品情绪得分组成分析")
-            fig_waterfall = create_emotion_score_waterfall()
-            st.plotly_chart(fig_waterfall, use_container_width=True, key='emotion_waterfall_pro')
-            
-            st.divider()
-            st.markdown("### 📈 基础情绪分析")
         
         # 情绪概览
         col1, col2 = st.columns(2)
@@ -1106,9 +819,113 @@ def main():
             """, unsafe_allow_html=True)
     
     # ===== 新增 Tab 6: 竞争分析 =====
-
-    # Tab 7: 产品分析
-    with tab7:
+    with tab6:
+        st.subheader("🎭 竞争对手分析")
+        
+        st.markdown("""
+        <div class="insight-box">
+        <strong>💡 市场格局</strong><br>
+        当前3D打印定制市场竞争激烈，主要竞争对手各有特色。
+        了解竞争对手的优劣势，有助于制定差异化策略。
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 生成竞争对手数据
+        competitor_df = generate_competitor_data()
+        
+        # 市场份额
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 市场份额分布")
+            fig_market_share = px.pie(
+                competitor_df,
+                values='market_share',
+                names='name',
+                title='各竞争对手市场份额',
+                color_discrete_sequence=px.colors.sequential.Blues_r
+            )
+            st.plotly_chart(fig_market_share, use_container_width=True, key='fig_market_share_1')
+        
+        with col2:
+            st.markdown("#### 价格定位对比")
+            fig_price = px.bar(
+                competitor_df.sort_values('avg_price', ascending=False),
+                x='name',
+                y='avg_price',
+                title='各竞争对手平均价格',
+                color='avg_price',
+                color_continuous_scale='Blues'
+            )
+            fig_price.update_layout(
+                xaxis_title='竞争对手',
+                yaxis_title='平均价格 ($)',
+                xaxis_tickangle=-45
+            )
+            st.plotly_chart(fig_price, use_container_width=True, key='fig_price_1')
+        
+        st.divider()
+        
+        # 竞争对手详细分析
+        st.markdown("#### 竞争对手详细分析")
+        
+        for _, competitor in competitor_df.iterrows():
+            with st.expander(f"**{competitor['name']}** - 市场份额: {competitor['market_share']:.1f}%"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown(f"""
+                    <div class="competitor-card">
+                    <strong>📊 基本信息</strong><br>
+                    • 市场份额: {competitor['market_share']:.1f}%<br>
+                    • 平均价格: ${competitor['avg_price']:.2f}<br>
+                    • 竞争策略: {competitor['strategy']}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    st.success(f"**✅ 优势**: {competitor['strength']}")
+                
+                with col2:
+                    st.error(f"**⚠️ 劣势**: {competitor['weakness']}")
+                    
+                    # 差异化建议
+                    st.info(f"""
+                    **💡 差异化机会**:
+                    针对{competitor['name']}的劣势，我们可以在{competitor['weakness']}方面建立优势。
+                    """)
+        
+        st.divider()
+        
+        # 竞争策略矩阵
+        st.markdown("#### 市场定位矩阵")
+        
+        fig_matrix = px.scatter(
+            competitor_df,
+            x='avg_price',
+            y='market_share',
+            size='market_share',
+            color='name',
+            title='价格 vs 市场份额定位矩阵',
+            hover_data=['strategy']
+        )
+        fig_matrix.update_layout(
+            xaxis_title='平均价格 ($)',
+            yaxis_title='市场份额 (%)'
+        )
+        st.plotly_chart(fig_matrix, use_container_width=True, key='fig_matrix_1')
+        
+        st.markdown("""
+        <div class="insight-box">
+        <strong>🎯 我们的定位建议</strong><br>
+        • <strong>目标市场</strong>: 中高端市场（$35-45价格区间）<br>
+        • <strong>差异化策略</strong>: 快速交付 + 高品质 + 合理价格<br>
+        • <strong>突破口</strong>: 填补"高品质+快速交付"的市场空白<br>
+        • <strong>目标份额</strong>: 第一年争取5-8%市场份额
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # ===== 新增 Tab 6: 产品分析 =====
+    with tab6:
         st.subheader("🎯 推荐产品详细分析")
         
         st.markdown("""
@@ -1355,9 +1172,7 @@ def main():
             """, unsafe_allow_html=True)
     
     # ===== 新增 Tab 7: 竞争分析 =====
-
-    # Tab 8: 竞争分析
-    with tab8:
+    with tab7:
         st.subheader("🎭 竞争对手分析")
         
         st.markdown("""
@@ -1383,7 +1198,7 @@ def main():
                 title='各竞争对手市场份额',
                 color_discrete_sequence=px.colors.sequential.Blues_r
             )
-            st.plotly_chart(fig_market_share, use_container_width=True, key='fig_market_share_1')
+            st.plotly_chart(fig_market_share, use_container_width=True, key='fig_market_share_2')
         
         with col2:
             st.markdown("#### 价格定位对比")
@@ -1400,36 +1215,13 @@ def main():
                 yaxis_title='平均价格 ($)',
                 xaxis_tickangle=-45
             )
-            st.plotly_chart(fig_price, use_container_width=True, key='fig_price_1')
+            st.plotly_chart(fig_price, use_container_width=True, key='fig_price_2')
         
         st.divider()
         
-        # === 新增：四象限矩阵分析 ===
-        if MATRIX_FIX_AVAILABLE:
-            st.markdown(" #### 📊 市场定位矩阵（四象限分析）")
-            st.markdown("""
-            <div class="insight-box">
-            <strong>💡 图表说明</strong><br>
-            • <strong>右上象限（领导者）</strong>: 高价格 + 高市场份额<br>
-            • <strong>左上象限（挑战者）</strong>: 低价格 + 高市场份额<br>
-            • <strong>左下象限（跟随者）</strong>: 低价格 + 低市场份额<br>
-            • <strong>右下象限（利基市场）</strong>: 高价格 + 低市场份额
-            </div>
-            """, unsafe_allow_html=True)
-            
-            fig_matrix = create_quadrant_matrix(
-                competitor_df,
-                x_col='avg_price',
-                y_col='market_share',
-                name_col='name',
-                title='竞争对手市场定位矩阵'
-            )
-            st.plotly_chart(fig_matrix, use_container_width=True, key='competitor_matrix_pro')
-            
-            st.divider()
-        
         # 竞争对手详细分析
-        st.markdown(" #### 竞争对手详细分析")        
+        st.markdown("#### 竞争对手详细分析")
+        
         for _, competitor in competitor_df.iterrows():
             with st.expander(f"**{competitor['name']}** - 市场份额: {competitor['market_share']:.1f}%"):
                 col1, col2 = st.columns(2)
@@ -1473,22 +1265,20 @@ def main():
             xaxis_title='平均价格 ($)',
             yaxis_title='市场份额 (%)'
         )
-        st.plotly_chart(fig_matrix, use_container_width=True, key='fig_matrix_1')
+        st.plotly_chart(fig_matrix, use_container_width=True, key='fig_matrix_2')
         
         st.markdown("""
         <div class="insight-box">
         <strong>🎯 我们的定位建议</strong><br>
         • <strong>目标市场</strong>: 中高端市场（$35-45价格区间）<br>
         • <strong>差异化策略</strong>: 快速交付 + 高品质 + 合理价格<br>
-        • <strong>突破口</strong>: 填补"高品质+快速交付"的市场空白<br>
+        • <strong>突破口</strong>: 填补“高品质+快速交付”的市场空白<br>
         • <strong>目标份额</strong>: 第一年争取5-8%市场份额
         </div>
         """, unsafe_allow_html=True)
     
-    # ===== 新增 Tab 6: 产品分析 =====
-
-    # Tab 9: 行动计划
-    with tab9:
+    # ===== 新增 Tab 8: 行动计划 =====
+    with tab8:
         st.subheader("📋 8周行动计划")
         
         st.markdown("""
@@ -1654,7 +1444,220 @@ def main():
         """, unsafe_allow_html=True)
     
     # ===== 新增 Tab 9: 执行摘要 =====
-
+    with tab9:
+        st.subheader("📊 执行摘要")
+        
+        st.markdown("""
+        <div class="insight-box">
+        <strong>🎯 核心目标</strong><br>
+        基于社交媒体情绪数据和电商平台销售数据，快速识别高潜力产品机会，
+        助力3D打印定制业务实现数据驱动的产品选择和市场策略。
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # 三大核心洞察
+        st.markdown("### 💡 三大核心洞察")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+            <div class="insight-box">
+            <strong>💭 情绪发现</strong><br><br>
+            • <strong>正面情绪占主导</strong>: 兴奋、好奇、满意等正面情绪占总量的65%<br>
+            • <strong>上升最快</strong>: 兴奋情绪4周增长38%，表明用户对创新产品接受度高<br>
+            • <strong>需要关注</strong>: 担忧和困惑情绪主要集中在价格和质量方面<br><br>
+            <em>建议：强化产品质量展示，提供透明的定价说明</em>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="insight-box">
+            <strong>💰 销售发现</strong><br><br>
+            • <strong>Etsy表现最佳</strong>: 增长率32%，用户愿意为定制付费<br>
+            • <strong>热门类别</strong>: 办公用品和数码配件需求旺盛<br>
+            • <strong>平均客单价</strong>: $38，中高端市场潜力大<br><br>
+            <em>建议：优先在Etsy上架，重点开发办公和数码类产品</em>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div class="insight-box">
+            <strong>🎯 战略建议</strong><br><br>
+            • <strong>快速进入</strong>: 市场处于快速增长期，机会窗口期<br>
+            • <strong>小批量测试</strong>: 8周内完成从设计到上线<br>
+            • <strong>预算控制</strong>: 总预算$9,000，分阶段执行<br><br>
+            <em>建议：立即启动Top 3产品开发</em>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # 6个KPI
+        st.markdown("### 📊 6大关键指标 (KPI)")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric(
+                "💬 总提及次数",
+                "8,420",
+                "+28.5%",
+                help="过去4周在社交媒体上的总提及次数"
+            )
+        
+        with col2:
+            st.metric(
+                "🚀 平均情绪分数",
+                "44.2",
+                "+3.8",
+                help="正面情绪分数，满分50分"
+            )
+        
+        with col3:
+            st.metric(
+                "📈 增长率",
+                "32.1%",
+                "+5.2%",
+                help="过去4周的平均增长率"
+            )
+        
+        col4, col5, col6 = st.columns(3)
+        
+        with col4:
+            st.metric(
+                "💰 预估营收",
+                "$48,200",
+                "+$12,500",
+                help="基于Top 5产品的预估月营收"
+            )
+        
+        with col5:
+            st.metric(
+                "🎯 转化率",
+                "5.8%",
+                "+1.2%",
+                help="从浏览到购买的平均转化率"
+            )
+        
+        with col6:
+            st.metric(
+                "⭐ 客户满意度",
+                "4.5/5.0",
+                "+0.3",
+                help="平台平均评分"
+            )
+        
+        st.divider()
+        
+        # Top 3产品推荐
+        st.markdown("### 🏆 Top 3 产品推荐")
+        
+        top_products = [
+            {
+                'rank': 1,
+                'name': '迷你桌面收纳盒',
+                'score': 45.2,
+                'growth': 38.5,
+                'revenue': 12500,
+                'reason': '情绪分数最高，办公场景需求旺盛，适合快速进入',
+                'link': 'https://www.etsy.com/search?q=desk+organizer+3d+print'
+            },
+            {
+                'rank': 2,
+                'name': '创意手机支架',
+                'score': 43.8,
+                'growth': 32.1,
+                'revenue': 9800,
+                'reason': 'TikTok平台表现极佳，年轻用户喜爱，定制化需求强',
+                'link': 'https://www.etsy.com/search?q=phone+stand+3d+print'
+            },
+            {
+                'rank': 3,
+                'name': '装饰性墙挂',
+                'score': 42.5,
+                'growth': 28.3,
+                'revenue': 8500,
+                'reason': 'Instagram/Pinterest表现优秀，家居装饰市场稳定',
+                'link': 'https://www.etsy.com/search?q=wall+decor+3d+print'
+            }
+        ]
+        
+        for product in top_products:
+            with st.expander(f"**#{product['rank']} {product['name']}** - 情绪分数: {product['score']}", expanded=(product['rank']==1)):
+                col1, col2 = st.columns([2, 1])
+                
+                with col1:
+                    st.markdown(f"""
+                    **📊 核心指标**
+                    - 情绪分数: **{product['score']}**/50
+                    - 增长率: **{product['growth']}%**
+                    - 预估月营收: **${product['revenue']:,}**
+                    
+                    **✅ 推荐理由**
+                    {product['reason']}
+                    """)
+                    
+                    st.markdown(f"[🔗 查看类似产品]({product['link']})")
+                
+                with col2:
+                    # 进度条
+                    st.markdown("**各项评分**")
+                    st.progress(product['score']/50, text=f"情绪: {product['score']}/50")
+                    st.progress(product['growth']/50, text=f"增长: {product['growth']:.0f}%")
+                    st.progress(min(product['revenue']/15000, 1.0), text=f"营收: ${product['revenue']/1000:.1f}K")
+        
+        st.divider()
+        
+        # 数据解读
+        st.markdown("### 📖 数据解读")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            <div class="insight-box">
+            <strong>🔍 如何读懂情绪分数</strong><br><br>
+            情绪分数基于社交媒体用户评论和互动数据，通过AI分析生成：<br><br>
+            • <strong>40-50分</strong>: 极高正面情绪，强烈推荐<br>
+            • <strong>35-40分</strong>: 正面情绪为主，值得尝试<br>
+            • <strong>30-35分</strong>: 中立态度，需谨慎评估<br>
+            • <strong>30分以下</strong>: 负面情绪较多，不建议进入
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="insight-box">
+            <strong>📈 如何读懂增长率</strong><br><br>
+            增长率反映了4周内的趋势变化，帮助判断市场热度：<br><br>
+            • <strong>30%以上</strong>: 快速增长，市场需求旺盛<br>
+            • <strong>15-30%</strong>: 稳定增长，市场潜力大<br>
+            • <strong>0-15%</strong>: 缓慢增长，需要营销推动<br>
+            • <strong>负增长</strong>: 市场需求下降，谨慎进入
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # 下一步行动
+        st.markdown("""
+        <div class="insight-box">
+        <strong>🚀 立即行动清单</strong><br><br>
+        1. ✅ <strong>确认产品选择</strong>: 从 Top 3 中选择 1-2 个产品启动<br>
+        2. ✅ <strong>联系供应商</strong>: 找到3D打印材料供应商，获取报价<br>
+        3. ✅ <strong>注册平台</strong>: 在 Etsy 和 Amazon 注册卖家账号<br>
+        4. ✅ <strong>开始设计</strong>: 完成产品3D建模和打样<br>
+        5. ✅ <strong>制定计划</strong>: 根据行动计划Tab制定详细时间表<br><br>
+        <strong>💼 预算准备</strong>: $9,000 (分阶段执行)<br>
+        <strong>⏰ 预计周期</strong>: 8周（从设计到上线）
+        </div>
+        """, unsafe_allow_html=True)
+    
     # 页脚
     st.divider()
     st.caption("🖨️ 3D打印市场情报系统（完整增强版）| 数据来源: TikTok | AI分析: OpenAI GPT-4")

@@ -1,0 +1,58 @@
+    with tab1:
+        st.subheader("📊 执行摘要")
+        
+        # 显示选项
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            search_term = st.text_input("🔍 搜索产品名称", "")
+        with col2:
+            sort_by = st.selectbox("排序依据", ["product_rank", "total_score", "views", "engagement_rate"])
+        
+        # 搜索筛选
+        display_df = filtered_df.copy()
+        if search_term:
+            display_df = display_df[display_df['product_name'].str.contains(search_term, case=False, na=False)]
+        
+        # 排序
+        display_df = display_df.sort_values(by=sort_by, ascending=(sort_by == 'product_rank'))
+        
+        # 格式化显示列
+        display_columns = {
+            'product_rank': '排名',
+            'product_name': '产品名称',
+            'product_category': '类别',
+            'total_score': '总分',
+            'views': '浏览量',
+            'likes': '点赞数',
+            'engagement_rate': '互动率(%)',
+            'tiktok_url': 'TikTok链接'
+        }
+        
+        # 创建显示数据框
+        show_df = display_df[list(display_columns.keys())].copy()
+        show_df.columns = list(display_columns.values())
+        
+        # 添加颜色标记
+        def highlight_score(val):
+            if val >= 45:
+                return 'background-color: #4CAF50; color: white'
+            elif val <= 35:
+                return 'background-color: #FF6B6B; color: white'
+            else:
+                return ''
+        
+        # 显示表格
+        st.dataframe(
+            show_df.style.applymap(highlight_score, subset=['总分']),
+            use_container_width=True,
+            height=500
+        )
+        
+        # 下载按钮
+        csv = display_df.to_csv(index=False).encode('utf-8-sig')
+        st.download_button(
+            label="📥 下载数据 (CSV)",
+            data=csv,
+            file_name=f"products_{selected_week}.csv",
+            mime="text/csv"
+        )
