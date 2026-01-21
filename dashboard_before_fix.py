@@ -9,23 +9,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import import datetime, timedelta
+from pathlib import Path
+import glob
+from datetime import datetime
 import numpy as np
-
-# Import custom emotion charts
-try:
-    from emotion_charts import (
-        create_emotion_radar_chart,
-        create_emotion_frequency_bar,
-        create_emotion_opportunity_matrix,
-        create_emotion_score_waterfall,
-        generate_sample_emotion_data
-    )
-    EMOTION_CHARTS_AVAILABLE = True
-except ImportError:
-    EMOTION_CHARTS_AVAILABLE = False
-    print("Warning: emotion_charts module not found")
-
 
 # 页面配置
 st.set_page_config(
@@ -350,15 +337,15 @@ def main():
     
     # 标签页（新增3个Tab）
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
-        "📊 执行摘要",  # 移到第一位
-        "📋 产品排名",
-        "🎯 产品分析",
-        "💭 情绪分析",
-        "🎭 竞争分析",
-        "📊 数据分析",
-        "🤖 AI洞察",
+        "📋 产品排名", 
+        "📊 数据分析", 
+        "🤖 AI洞察", 
         "📈 历史趋势",
-        "📋 行动计划"
+        "💭 情绪分析",  # 新增
+        "🎯 产品分析",  # 新增
+        "🎭 竞争分析",  # 新增
+        "📋 行动计划",  # 新增
+        "📊 执行摘要"   # 新增
     ])
     
     # Tab 1: 产品排名表格（保持不变）
