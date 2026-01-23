@@ -1125,8 +1125,9 @@ def main():
             
             # Top 5 产品对比
             st.markdown("#### Top 5 产品对比")
-            # Sort by emotion_score instead of product_rank
-            top5 = filtered_df.nlargest(5, 'emotion_score')
+            # Sort by emotion_score if available, otherwise use total_score
+            sort_col = 'emotion_score' if 'emotion_score' in filtered_df.columns else 'total_score'
+            top5 = filtered_df.nlargest(5, sort_col)
             fig_bar = go.Figure()
             fig_bar.add_trace(go.Bar(
                 name='总分',
