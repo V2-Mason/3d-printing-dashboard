@@ -50,6 +50,13 @@ try:
 except ImportError:
     MATRIX_FIX_AVAILABLE = False
 
+# Import dynamic summary generator
+try:
+    from summary_generator import generate_dynamic_summary, format_insight_html
+    SUMMARY_GENERATOR_AVAILABLE = True
+except ImportError:
+    SUMMARY_GENERATOR_AVAILABLE = False
+
 # 页面配置
 st.set_page_config(
     page_title="3D打印市场情报仪表板",
@@ -470,100 +477,171 @@ def main():
         
         st.divider()
         
-        # 三大核心洞察
+        # 三大核心洞察 - 动态生成
         st.markdown("### 💡 三大核心洞察")
         
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>情绪发现</strong><br><br>
-            • <strong>正面情绪占主导</strong>: 兴奋、好奇、满意等正面情绪占总量的65%<br>
-            • <strong>上升最快</strong>: 兴奋情绪4周增长38%，表明用户对创新产品接受度高<br>
-            • <strong>需要关注</strong>: 担忧和困惑情绪主要集中在价格和质量方面<br><br>
-            <em>建议：强化产品质量展示，提供透明的定价说明</em>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>销售发现</strong><br><br>
-            • <strong>Etsy表现最佳</strong>: 增长率32%，用户愿意为定制付费<br>
-            • <strong>热门类别</strong>: 办公用品和数码配件需求旺盛<br>
-            • <strong>平均客单价</strong>: $38，中高端市场潜力大<br><br>
-            <em>建议：优先在Etsy上架，重点开发办公和数码类产品</em>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown("""
-            <div class="insight-box">
-            <strong>战略建议</strong><br><br>
-            • <strong>快速进入</strong>: 市场处于快速增长期，机会窗口期<br>
-            • <strong>小批量测试</strong>: 8周内完成从设计到上线<br>
-            • <strong>预算控制</strong>: 总预算$9,000，分阶段执行<br><br>
-            <em>建议：立即启动Top 3产品开发</em>
-            </div>
-            """, unsafe_allow_html=True)
+        # 生成动态摘要
+        if SUMMARY_GENERATOR_AVAILABLE:
+            summary = generate_dynamic_summary(filtered_df)
+            emotion_html, sales_html, strategy_html = format_insight_html(summary)
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown(emotion_html, unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown(sales_html, unsafe_allow_html=True)
+            
+            with col3:
+                st.markdown(strategy_html, unsafe_allow_html=True)
+        else:
+            # 退回到静态内容
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown("""
+                <div class="insight-box">
+                <strong>情绪发现</strong><br><br>
+                • <strong>正面情绪占主导</strong>: 兴奋、好奇、满意等正面情绪占总量的65%<br>
+                • <strong>上升最快</strong>: 兴奋情绪4周增长38%，表明用户对创新产品接受度高<br>
+                • <strong>需要关注</strong>: 担忧和困惑情绪主要集中在价格和质量方面<br><br>
+                <em>建议：强化产品质量展示，提供透明的定价说明</em>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown("""
+                <div class="insight-box">
+                <strong>销售发现</strong><br><br>
+                • <strong>Etsy表现最佳</strong>: 增长率32%，用户愿意为定制付费<br>
+                • <strong>热门类别</strong>: 办公用品和数码配件需求旺盛<br>
+                • <strong>平均客单价</strong>: $38，中高端市场潜力大<br><br>
+                <em>建议：优先在Etsy上架，重点开发办公和数码类产品</em>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col3:
+                st.markdown("""
+                <div class="insight-box">
+                <strong>战略建议</strong><br><br>
+                • <strong>快速进入</strong>: 市场处于快速增长期，机会窗口期<br>
+                • <strong>小批量测试</strong>: 8周内完成从设计到上线<br>
+                • <strong>预算控制</strong>: 总预算$9,000，分阶段执行<br><br>
+                <em>建议：立即启动Top 3产品开发</em>
+                </div>
+                """, unsafe_allow_html=True)
         
         st.divider()
         
-        # 6个KPI
+        # 6个KPI - 动态计算
         st.markdown("### 6大关键指标 (KPI)")
         
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.metric(
-                "总提及次数",
-                "8,420",
-                "+28.5%",
-                help="过去4周在社交媒体上的总提及次数"
-            )
-        
-        with col2:
-            st.metric(
-                "平均情绪分数",
-                "44.2",
-                "+3.8",
-                help="正面情绪分数，满分50分"
-            )
-        
-        with col3:
-            st.metric(
-                "增长率",
-                "32.1%",
-                "+5.2%",
-                help="过去4周的平均增长率"
-            )
-        
-        col4, col5, col6 = st.columns(3)
-        
-        with col4:
-            st.metric(
-                "预估营收",
-                "$48,200",
-                "+$12,500",
-                help="基于Top 5产品的预估月营收"
-            )
-        
-        with col5:
-            st.metric(
-                "转化率",
-                "5.8%",
-                "+1.2%",
-                help="从浏览到购买的平均转化率"
-            )
-        
-        with col6:
-            st.metric(
-                "客户满意度",
-                "4.5/5.0",
-                "+0.3",
-                help="平台平均评分"
-            )
+        if SUMMARY_GENERATOR_AVAILABLE:
+            kpis = summary.get('kpis', {})
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric(
+                    "总提及次数",
+                    f"{kpis.get('total_mentions', 0):,}",
+                    help="当前周在社交媒体和电商平台上的总浏览量"
+                )
+            
+            with col2:
+                st.metric(
+                    "平均情绪分数",
+                    f"{kpis.get('avg_emotion_score', 0):.1f}",
+                    help="正面情绪分数，满分50分"
+                )
+            
+            with col3:
+                growth = kpis.get('avg_growth_rate', 0)
+                st.metric(
+                    "增长率",
+                    f"{growth:+.1f}%",
+                    help="当前周的平均增长率"
+                )
+            
+            col4, col5, col6 = st.columns(3)
+            
+            with col4:
+                revenue = kpis.get('total_revenue', 0)
+                st.metric(
+                    "预估营收",
+                    f"${revenue:,}",
+                    help="基于当前周数据的预估总营收"
+                )
+            
+            with col5:
+                conversion = kpis.get('avg_conversion_rate', 0)
+                st.metric(
+                    "转化率",
+                    f"{conversion:.2f}%",
+                    help="从浏览到购买的平均转化率"
+                )
+            
+            with col6:
+                rating = kpis.get('avg_rating', 0)
+                st.metric(
+                    "客户满意度",
+                    f"{rating:.2f}/5.0",
+                    help="平台平均评分"
+                )
+        else:
+            # 退回到静态KPI
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric(
+                    "总提及次数",
+                    "8,420",
+                    "+28.5%",
+                    help="过去4周在社交媒体上的总提及次数"
+                )
+            
+            with col2:
+                st.metric(
+                    "平均情绪分数",
+                    "44.2",
+                    "+3.8",
+                    help="正面情绪分数，满分50分"
+                )
+            
+            with col3:
+                st.metric(
+                    "增长率",
+                    "32.1%",
+                    "+5.2%",
+                    help="过去4周的平均增长率"
+                )
+            
+            col4, col5, col6 = st.columns(3)
+            
+            with col4:
+                st.metric(
+                    "预估营收",
+                    "$48,200",
+                    "+$12,500",
+                    help="基于Top 5产品的预估月营收"
+                )
+            
+            with col5:
+                st.metric(
+                    "转化率",
+                    "5.8%",
+                    "+1.2%",
+                    help="从浏览到购买的平均转化率"
+                )
+            
+            with col6:
+                st.metric(
+                    "客户满意度",
+                    "4.5/5.0",
+                    "+0.3",
+                    help="平台平均评分"
+                )
         
         st.divider()
         
