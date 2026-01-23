@@ -57,6 +57,18 @@ try:
 except ImportError:
     SUMMARY_GENERATOR_AVAILABLE = False
 
+# Import emotion visualization module
+try:
+    from emotion_viz import (
+        create_emotion_health_gauge,
+        create_emotion_topic_heatmap,
+        create_emotion_correlation_chart,
+        generate_emotion_insights
+    )
+    EMOTION_VIZ_AVAILABLE = True
+except ImportError:
+    EMOTION_VIZ_AVAILABLE = False
+
 # 页面配置
 st.set_page_config(
     page_title="3D打印市场情报仪表板",
@@ -1200,6 +1212,60 @@ def main():
             """, unsafe_allow_html=True)
         
         st.divider()
+        
+        # 情绪健康仪表盘
+        if EMOTION_VIZ_AVAILABLE and 'emotion_score' in filtered_df.columns:
+            st.markdown("### 情绪健康仪表盘")
+            
+            col1, col2 = st.columns([1, 2])
+            
+            with col1:
+                avg_emotion_score = filtered_df['emotion_score'].mean()
+                fig_gauge = create_emotion_health_gauge(avg_emotion_score)
+                st.plotly_chart(fig_gauge, use_container_width=True, key='emotion_gauge')
+            
+            with col2:
+                st.markdown("#### 💡 情绪健康洞察")
+                insights = generate_emotion_insights(avg_emotion_score)
+                st.markdown(insights)
+            
+            st.divider()
+        
+        # 情绪-主题交叉分析热力图
+        if EMOTION_VIZ_AVAILABLE:
+            st.markdown("### 情绪-主题交叉分析")
+            
+            fig_heatmap = create_emotion_topic_heatmap(filtered_df)
+            st.plotly_chart(fig_heatmap, use_container_width=True, key='emotion_heatmap')
+            
+            st.markdown("""
+            <div class="insight-box">
+            <strong>🔍 如何阅读热力图</strong><br>
+            • <strong>颜色越深</strong>：表示该情绪与主题的关联越强<br>
+            • <strong>点击格子</strong>：查看具体的关联强度数值<br>
+            • <strong>关键发现</strong>：兴奋与设计强相关，担忧与价格强相关<br>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.divider()
+        
+        # 情绪关联分析
+        if EMOTION_VIZ_AVAILABLE:
+            st.markdown("### 情绪关联分析")
+            
+            fig_correlation = create_emotion_correlation_chart(filtered_df)
+            st.plotly_chart(fig_correlation, use_container_width=True, key='emotion_correlation')
+            
+            st.markdown("""
+            <div class="insight-box">
+            <strong>🎯 关键洞察</strong><br>
+            • <strong>兴奋</strong>主要与<strong>创新设计</strong>相关 → 用户喜欢新颖产品<br>
+            • <strong>担忧</strong>主要与<strong>价格</strong>相关 → 建议提供更多价格档位<br>
+            • <strong>满意</strong>主要与<strong>质量</strong>相关 → 继续保持质量优势<br>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.divider()
         
         # 生成情绪数据
         emotion_df = generate_emotion_data()
