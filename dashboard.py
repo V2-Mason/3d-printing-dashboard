@@ -1061,7 +1061,8 @@ def main():
             
             # Top 5 产品对比
             st.markdown("#### Top 5 产品对比")
-            top5 = filtered_df.nsmallest(5, 'product_rank')
+            # Sort by emotion_score instead of product_rank
+            top5 = filtered_df.nlargest(5, 'emotion_score')
             fig_bar = go.Figure()
             fig_bar.add_trace(go.Bar(
                 name='总分',
@@ -1097,7 +1098,9 @@ def main():
             # 产品基本信息
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("排名", f"#{product_data['product_rank']}")
+                # Rank based on emotion_score
+                rank = filtered_df[filtered_df['product_name'] == selected_product].index[0] + 1
+                st.metric("排名", f"#{rank}")
             with col2:
                 st.metric("总分", f"{product_data['total_score']:.2f}")
             with col3:
