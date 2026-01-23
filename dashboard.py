@@ -722,12 +722,27 @@ def main():
         
         if 'platform' in filtered_df.columns:
             # 按平台统计
-            platform_stats = filtered_df.groupby('platform').agg({
+            # Determine which sales column to use
+            sales_col = None
+            if 'sales_volume' in filtered_df.columns:
+                sales_col = 'sales_volume'
+            elif 'sales_estimate' in filtered_df.columns:
+                sales_col = 'sales_estimate'
+            
+            agg_dict = {
                 'product_name': 'count',
-                'views': 'sum',
-                'sales_volume': 'sum' if 'sales_volume' in filtered_df.columns else 'count'
-            }).reset_index()
-            platform_stats.columns = ['平台', '产品数量', '总浏览量', '总销量']
+                'views': 'sum'
+            }
+            if sales_col:
+                agg_dict[sales_col] = 'sum'
+            
+            platform_stats = filtered_df.groupby('platform').agg(agg_dict).reset_index()
+            
+            # Rename columns
+            col_names = ['平台', '产品数量', '总浏览量']
+            if sales_col:
+                col_names.append('总销量')
+            platform_stats.columns = col_names
             
             # 计算占比
             total_products = platform_stats['产品数量'].sum()
@@ -737,7 +752,8 @@ def main():
             
             # 格式化数字
             platform_stats['总浏览量'] = platform_stats['总浏览量'].apply(lambda x: f"{x:,}")
-            platform_stats['总销量'] = platform_stats['总销量'].apply(lambda x: f"{x:,}")
+            if '总销量' in platform_stats.columns:
+                platform_stats['总销量'] = platform_stats['总销量'].apply(lambda x: f"{x:,}")
             
             st.dataframe(platform_stats, use_container_width=True, hide_index=True)
             
