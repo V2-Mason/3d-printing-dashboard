@@ -299,7 +299,7 @@ def main():
         st.divider()
         
         # 筛选选项
-        st.subheader("🔍 数据筛选")
+        st.subheader("数据筛选")
         
         # 加载数据
         if DATA_MANAGER_AVAILABLE:
@@ -328,7 +328,7 @@ def main():
         st.divider()
         
         # 显示选项
-        st.subheader("📊 显示选项")
+        st.subheader("显示选项")
         show_ai_analysis = st.checkbox("显示AI分析", value=True)
         show_trends = st.checkbox("显示历史趋势", value=True)
         
@@ -397,7 +397,7 @@ def main():
     ]
     
     # KPI指标卡片
-    st.subheader("📈 关键指标")
+    st.subheader("关键指标")
     col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
@@ -443,26 +443,26 @@ def main():
     
     # 标签页（新增3个Tab）
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
-        "📊 执行摘要",   # 移到第一位
-        "📋 产品排名",
-        "📊 数据分析",
-        "🤖 AI洞察",
-        "📈 历史趋势",
-        "💭 情绪分析",
-        "🎯 产品分析",
-        "🎭 竞争分析",
-        "📋 行动计划"
+        "执行摘要",
+        "产品排名",
+        "数据分析",
+        "AI洞察",
+        "历史趋势",
+        "情绪分析",
+        "产品分析",
+        "竞争分析",
+        "行动计划"
     ])
     
     # Tab 1: 产品排名表格（保持不变）
 
     # Tab 1: 执行摘要
     with tab1:
-        st.subheader("📊 执行摘要")
+        st.subheader("执行摘要")
         
         st.markdown("""
         <div class="insight-box">
-        <strong>🎯 核心目标</strong><br>
+        <strong>核心目标</strong><br>
         基于社交媒体情绪数据和电商平台销售数据，快速识别高潜力产品机会，
         助力3D打印定制业务实现数据驱动的产品选择和市场策略。
         </div>
@@ -478,7 +478,7 @@ def main():
         with col1:
             st.markdown("""
             <div class="insight-box">
-            <strong>💭 情绪发现</strong><br><br>
+            <strong>情绪发现</strong><br><br>
             • <strong>正面情绪占主导</strong>: 兴奋、好奇、满意等正面情绪占总量的65%<br>
             • <strong>上升最快</strong>: 兴奋情绪4周增长38%，表明用户对创新产品接受度高<br>
             • <strong>需要关注</strong>: 担忧和困惑情绪主要集中在价格和质量方面<br><br>
@@ -489,7 +489,7 @@ def main():
         with col2:
             st.markdown("""
             <div class="insight-box">
-            <strong>💰 销售发现</strong><br><br>
+            <strong>销售发现</strong><br><br>
             • <strong>Etsy表现最佳</strong>: 增长率32%，用户愿意为定制付费<br>
             • <strong>热门类别</strong>: 办公用品和数码配件需求旺盛<br>
             • <strong>平均客单价</strong>: $38，中高端市场潜力大<br><br>
@@ -500,7 +500,7 @@ def main():
         with col3:
             st.markdown("""
             <div class="insight-box">
-            <strong>🎯 战略建议</strong><br><br>
+            <strong>战略建议</strong><br><br>
             • <strong>快速进入</strong>: 市场处于快速增长期，机会窗口期<br>
             • <strong>小批量测试</strong>: 8周内完成从设计到上线<br>
             • <strong>预算控制</strong>: 总预算$9,000，分阶段执行<br><br>
@@ -511,13 +511,13 @@ def main():
         st.divider()
         
         # 6个KPI
-        st.markdown("### 📊 6大关键指标 (KPI)")
+        st.markdown("### 6大关键指标 (KPI)")
         
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.metric(
-                "💬 总提及次数",
+                "总提及次数",
                 "8,420",
                 "+28.5%",
                 help="过去4周在社交媒体上的总提及次数"
@@ -525,7 +525,7 @@ def main():
         
         with col2:
             st.metric(
-                "🚀 平均情绪分数",
+                "平均情绪分数",
                 "44.2",
                 "+3.8",
                 help="正面情绪分数，满分50分"
@@ -533,7 +533,7 @@ def main():
         
         with col3:
             st.metric(
-                "📈 增长率",
+                "增长率",
                 "32.1%",
                 "+5.2%",
                 help="过去4周的平均增长率"
@@ -543,7 +543,7 @@ def main():
         
         with col4:
             st.metric(
-                "💰 预估营收",
+                "预估营收",
                 "$48,200",
                 "+$12,500",
                 help="基于Top 5产品的预估月营收"
@@ -551,7 +551,7 @@ def main():
         
         with col5:
             st.metric(
-                "🎯 转化率",
+                "转化率",
                 "5.8%",
                 "+1.2%",
                 help="从浏览到购买的平均转化率"
@@ -559,7 +559,7 @@ def main():
         
         with col6:
             st.metric(
-                "⭐ 客户满意度",
+                "客户满意度",
                 "4.5/5.0",
                 "+0.3",
                 help="平台平均评分"
@@ -606,16 +606,16 @@ def main():
                 
                 with col1:
                     st.markdown(f"""
-                    **📊 核心指标**
+                    **核心指标**
                     - 情绪分数: **{product['score']}**/50
                     - 增长率: **{product['growth']}%**
                     - 预估月营收: **${product['revenue']:,}**
                     
-                    **✅ 推荐理由**
+                    **推荐理由**
                     {product['reason']}
                     """)
                     
-                    st.markdown(f"[🔗 查看类似产品]({product['link']})")
+                    st.markdown(f"[查看类似产品]({product['link']})")
                 
                 with col2:
                     # 进度条
@@ -634,7 +634,7 @@ def main():
         with col1:
             st.markdown("""
             <div class="insight-box">
-            <strong>🔍 如何读懂情绪分数</strong><br><br>
+            <strong>如何读懂情绪分数</strong><br><br>
             情绪分数基于社交媒体用户评论和互动数据，通过AI分析生成：<br><br>
             • <strong>40-50分</strong>: 极高正面情绪，强烈推荐<br>
             • <strong>35-40分</strong>: 正面情绪为主，值得尝试<br>
@@ -646,7 +646,7 @@ def main():
         with col2:
             st.markdown("""
             <div class="insight-box">
-            <strong>📈 如何读懂增长率</strong><br><br>
+            <strong>如何读懂增长率</strong><br><br>
             增长率反映了4周内的趋势变化，帮助判断市场热度：<br><br>
             • <strong>30%以上</strong>: 快速增长，市场需求旺盛<br>
             • <strong>15-30%</strong>: 稳定增长，市场潜力大<br>
@@ -660,7 +660,7 @@ def main():
         # 下一步行动
         st.markdown("""
         <div class="insight-box">
-        <strong>🚀 立即行动清单</strong><br><br>
+        <strong>立即行动清单</strong><br><br>
         1. ✅ <strong>确认产品选择</strong>: 从 Top 3 中选择 1-2 个产品启动<br>
         2. ✅ <strong>联系供应商</strong>: 找到3D打印材料供应商，获取报价<br>
         3. ✅ <strong>注册平台</strong>: 在 Etsy 和 Amazon 注册卖家账号<br>
@@ -680,7 +680,7 @@ def main():
         # 显示选项
         col1, col2 = st.columns([3, 1])
         with col1:
-            search_term = st.text_input("🔍 搜索产品名称", "")
+            search_term = st.text_input("搜索产品名称", "")
         with col2:
             sort_by = st.selectbox("排序依据", ["total_score", "views", "engagement_rate", "emotion_score"])
         
@@ -736,7 +736,7 @@ def main():
 
     # Tab 3: 数据分析
     with tab3:
-        st.subheader("📊 数据可视化分析")
+        st.subheader("数据可视化分析")
         
         col1, col2 = st.columns(2)
         
@@ -810,7 +810,7 @@ def main():
     # Tab 4: AI洞察
     with tab4:
         if show_ai_analysis:
-            st.subheader("🤖 AI深度分析")
+            st.subheader("AI深度分析")
             
             # 选择产品查看详细分析
             product_names = filtered_df['product_name'].tolist()
@@ -837,10 +837,10 @@ def main():
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("#### 🎯 市场定位")
+                st.markdown("#### 市场定位")
                 st.info(product_data['ai_market_positioning'])
                 
-                st.markdown("#### 💰 定价策略")
+                st.markdown("#### 定价策略")
                 st.success(product_data['ai_pricing_strategy'])
             
             with col2:
@@ -853,7 +853,7 @@ def main():
             st.divider()
             
             # TikTok链接
-            st.markdown(f"#### 🔗 查看原视频")
+            st.markdown(f"#### 查看原视频")
             st.markdown(f"[点击访问TikTok视频]({product_data['tiktok_url']})")
         else:
             st.info("请在侧边栏启用 '显示AI分析' 选项")
@@ -863,7 +863,7 @@ def main():
     # Tab 5: 历史趋势
     with tab5:
         if show_trends:
-            st.subheader("📈 历史趋势分析")
+            st.subheader("历史趋势分析")
             
             # 加载历史数据
             historical_df = load_all_weeks_data()
@@ -935,7 +935,7 @@ def main():
 
     # Tab 6: 情绪分析
     with tab6:
-        st.subheader("💭 情绪智能分析")
+        st.subheader("情绪智能分析")
         
         st.markdown("""
         <div class="insight-box">
@@ -950,7 +950,7 @@ def main():
         
         # === 新增：专业情绪分析图表 ===
         if EMOTION_CHARTS_AVAILABLE:
-            st.markdown("### 📊 专业情绪分析图表")
+            st.markdown("### 专业情绪分析图表")
             
             # 生成示例数据
             sample_data = generate_sample_emotion_data()
@@ -984,7 +984,7 @@ def main():
             st.plotly_chart(fig_waterfall, use_container_width=True, key='emotion_waterfall_pro')
             
             st.divider()
-            st.markdown("### 📈 基础情绪分析")
+            st.markdown("### 基础情绪分析")
         
         # 情绪概览
         col1, col2 = st.columns(2)
@@ -1031,7 +1031,7 @@ def main():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.markdown("##### 📈 上升情绪")
+            st.markdown("##### 上升情绪")
             rising = emotion_df[emotion_df['trend'] == '上升'].sort_values('count', ascending=False)
             for _, row in rising.iterrows():
                 st.success(f"**{row['emotion']}**: {row['count']}次 ({row['percentage']:.1f}%)")
@@ -1051,7 +1051,7 @@ def main():
         st.divider()
         
         # 4周趋势对比图
-        st.markdown("#### 📈 情绪4周趋势对比")
+        st.markdown("#### 情绪4周趋势对比")
         
         # 让用户选择要对比的情绪（最多5个）
         selected_emotions = st.multiselect(
@@ -1094,7 +1094,7 @@ def main():
         st.divider()
         
         # 情绪组合与产品机会
-        st.markdown("#### 🎯 情绪组合与产品机会识别")
+        st.markdown("#### 情绪组合与产品机会识别")
         
         col1, col2 = st.columns(2)
         
@@ -1144,7 +1144,7 @@ def main():
             if len(top_rising) > 0:
                 emotion_name = top_rising.iloc[0]['emotion']
                 trend_val = top_rising.iloc[0]['trend_value']
-                st.success(f"**📈 上升最快**: {emotion_name} (+{trend_val:.1f}%)")
+                st.success(f"**上升最快**: {emotion_name} (+{trend_val:.1f}%)")
                 st.caption("这表明用户对相关产品的兴趣正在增加")
         
         with col2:
@@ -1192,7 +1192,7 @@ def main():
 
     # Tab 7: 产品分析
     with tab7:
-        st.subheader("🎯 推荐产品详细分析")
+        st.subheader("推荐产品详细分析")
         
         st.markdown("""
         <div class="insight-box">
@@ -1321,7 +1321,7 @@ def main():
         st.divider()
         
         # 核心指标
-        st.markdown("#### 📊 核心指标")
+        st.markdown("#### 核心指标")
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
@@ -1339,7 +1339,7 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("#### 📈 4周趋势")
+            st.markdown("#### 4周趋势")
             trend_df = pd.DataFrame({
                 '周次': [f'第{i+1}周' for i in range(4)],
                 '提及次数': product['week_data']
@@ -1356,7 +1356,7 @@ def main():
             st.plotly_chart(fig_trend, use_container_width=True, key='fig_trend_3')
         
         with col2:
-            st.markdown("#### 🎯 平台表现")
+            st.markdown("#### 平台表现")
             platform_df = pd.DataFrame([
                 {'平台': k, '分数': v} for k, v in product['platform_scores'].items()
             ])
@@ -1379,7 +1379,7 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("#### 💭 情绪分布")
+            st.markdown("#### 情绪分布")
             emotion_df = pd.DataFrame([
                 {'情绪': k, '比例': v} for k, v in product['emotion_dist'].items()
             ])
@@ -1417,7 +1417,7 @@ def main():
             
             st.markdown("""
             <div class="insight-box">
-            <strong>🎯 市场机会</strong><br>
+            <strong>市场机会</strong><br>
             """ + product['opportunity'] + """
             </div>
             """, unsafe_allow_html=True)
@@ -1432,7 +1432,7 @@ def main():
             
             st.markdown("""
             <div class="insight-box">
-            <strong>🚀 执行策略</strong><br>
+            <strong>执行策略</strong><br>
             """ + product['strategy'].replace('\n', '<br>') + """
             </div>
             """, unsafe_allow_html=True)
@@ -1441,7 +1441,7 @@ def main():
 
     # Tab 8: 竞争分析
     with tab8:
-        st.subheader("🎭 竞争对手分析")
+        st.subheader("竞争对手分析")
         
         st.markdown("""
         <div class="insight-box">
@@ -1489,7 +1489,7 @@ def main():
         
         # === 新增：四象限矩阵分析 ===
         if MATRIX_FIX_AVAILABLE:
-            st.markdown("#### 📊 市场定位矩阵（四象限分析）")
+            st.markdown("#### 市场定位矩阵（四象限分析）")
             st.markdown("""
             <div class="insight-box">
             <strong>💡 图表说明</strong><br>
@@ -1520,7 +1520,7 @@ def main():
                 with col1:
                     st.markdown(f"""
                     <div class="competitor-card">
-                    <strong>📊 基本信息</strong><br>
+                    <strong>基本信息</strong><br>
                     • 市场份额: {competitor['market_share']:.1f}%<br>
                     • 平均价格: ${competitor['avg_price']:.2f}<br>
                     • 竞争策略: {competitor['strategy']}
@@ -1560,7 +1560,7 @@ def main():
         
         st.markdown("""
         <div class="insight-box">
-        <strong>🎯 我们的定位建议</strong><br>
+        <strong>我们的定位建议</strong><br>
         • <strong>目标市场</strong>: 中高端市场（$35-45价格区间）<br>
         • <strong>差异化策略</strong>: 快速交付 + 高品质 + 合理价格<br>
         • <strong>突破口</strong>: 填补"高品质+快速交付"的市场空白<br>
@@ -1572,11 +1572,11 @@ def main():
 
     # Tab 9: 行动计划
     with tab9:
-        st.subheader("📋 8周行动计划")
+        st.subheader("8周行动计划")
         
         st.markdown("""
         <div class="insight-box">
-        <strong>🎯 总体目标</strong><br>
+        <strong>总体目标</strong><br>
         在8周内完成产品开发、测试和初步市场推广，建立稳定的销售渠道。
         </div>
         """, unsafe_allow_html=True)
@@ -1629,7 +1629,7 @@ def main():
         st.divider()
         
         # 预算分配
-        st.markdown("#### 💰 预算分配")
+        st.markdown("#### 预算分配")
         
         col1, col2 = st.columns(2)
         
@@ -1661,7 +1661,7 @@ def main():
         st.divider()
         
         # 关键指标
-        st.markdown("#### 📊 关键绩效指标 (KPI)")
+        st.markdown("#### 关键绩效指标 (KPI)")
         
         col1, col2, col3, col4 = st.columns(4)
         
@@ -1727,7 +1727,7 @@ def main():
         # 下一步行动
         st.markdown("""
         <div class="insight-box">
-        <strong>🚀 立即行动</strong><br>
+        <strong>立即行动</strong><br>
         1. ✅ 确认Top 3产品选择<br>
         2. ✅ 联系3D打印材料供应商<br>
         3. ✅ 注册Etsy和Amazon卖家账号<br>
