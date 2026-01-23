@@ -15,8 +15,9 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import io
 import tempfile
 
-# Google Drive Shared Drive ID
-GDRIVE_FOLDER_ID = "0AFBJflVvo6P2Uk9PVA"
+# Google Drive Shared Drive ID and Folder ID
+GDRIVE_ID = "0AJM-v7YxYxbsUk9PVA"  # Shared Drive ID
+GDRIVE_FOLDER_ID = "1wv8bJxCTQdmGJ3BoKNKMVYnlNPvzLTrR"  # Folder ID where CSV files are stored
 
 
 def get_drive_service():
@@ -70,7 +71,9 @@ def list_files_in_folder(service, folder_id):
             q=query,
             fields="files(id, name, mimeType)",
             supportsAllDrives=True,
-            includeItemsFromAllDrives=True
+            includeItemsFromAllDrives=True,
+            corpora='drive',
+            driveId=GDRIVE_ID
         ).execute()
         return results.get('files', [])
     except Exception as e:
