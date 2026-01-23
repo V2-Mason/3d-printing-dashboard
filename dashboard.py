@@ -532,6 +532,122 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
         
+        # 可展开的数据面板
+        st.markdown("### 🔍 数据追溯与详细解释")
+        
+        with st.expander("📊 查看情绪发现的数据来源"):
+            st.markdown("""
+            #### 数据来源
+            - **社交媒体**: TikTok, Instagram, YouTube
+            - **电商平台**: Etsy, Amazon, eBay
+            - **评论数据**: 用户评论、评分、互动
+            
+            #### 计算方法
+            1. **正面情绪占比**: 正面情绪数量 / 总情绪数量 × 100%
+            2. **情绪增长率**: (当前周 - 上周) / 上周 × 100%
+            3. **情绪分数**: 基于正面情绪占比和强度的综合评分
+            
+            #### 原始数据示例
+            """
+            )
+            
+            if SUMMARY_GENERATOR_AVAILABLE:
+                emotion = summary.get('emotion', {})
+                st.dataframe({
+                    '指标': ['正面情绪占比', '平均情绪分', '最佳产品', '趋势方向'],
+                    '数值': [
+                        f"{emotion.get('positive_pct', 0):.1f}%",
+                        f"{emotion.get('avg_emotion', 0):.1f}",
+                        emotion.get('top_product', 'N/A'),
+                        emotion.get('trend_direction', '稳定')
+                    ]
+                }, use_container_width=True)
+        
+        with st.expander("💰 查看销售发现的数据来源"):
+            st.markdown("""
+            #### 数据来源
+            - **平台销售数据**: Etsy, Amazon, eBay 的公开数据
+            - **价格数据**: 各平台的产品定价
+            - **销量估算**: 基于浏览量和转化率
+            
+            #### 计算方法
+            1. **平台营收**: 各产品销售额汇总
+            2. **平均客单价**: 总营收 / 总订单数
+            3. **增长率**: 对比历史同期数据
+            
+            #### 平台对比
+            """
+            )
+            
+            if SUMMARY_GENERATOR_AVAILABLE:
+                sales = summary.get('sales', {})
+                platform_data = {
+                    '平台': [sales.get('top_platform', 'N/A'), '其他'],
+                    '预估营收': [f"${sales.get('top_platform_revenue', 0):,.0f}", '$-'],
+                    '平均价格': [f"${sales.get('avg_price', 0):.2f}", '$-'],
+                    '增长率': [f"{sales.get('avg_growth', 0):+.1f}%", '-']
+                }
+                st.dataframe(platform_data, use_container_width=True)
+        
+        with st.expander("🎯 查看战略建议的数据基础"):
+            st.markdown("""
+            #### 分析维度
+            - **市场潜力**: 基于搜索量、趋势、竞争度
+            - **ROI估算**: 基于成本、定价、销量预测
+            - **优先级排序**: 综合考虑潜力、竞争、执行难度
+            
+            #### 推荐逻辑
+            1. **高潜力 + 低竞争** = 高优先级
+            2. **高ROI + 低风险** = 建议快速进入
+            3. **市场增长趋势** = 机会窗口期
+            """
+            )
+            
+            if SUMMARY_GENERATOR_AVAILABLE:
+                strategy = summary.get('strategy', {})
+                st.dataframe({
+                    '指标': ['高潜力产品数', '低竞争机会', '平均ROI', '最高ROI'],
+                    '数值': [
+                        strategy.get('high_potential_count', 0),
+                        strategy.get('low_competition_count', 0),
+                        f"{strategy.get('avg_roi', 0):.1f}%",
+                        f"{strategy.get('max_roi', 0):.1f}%"
+                    ]
+                }, use_container_width=True)
+                
+                high_priority = strategy.get('high_priority_products', [])
+                if high_priority:
+                    st.markdown("#### 高优先级产品")
+                    for i, product in enumerate(high_priority[:3], 1):
+                        st.write(f"{i}. {product}")
+        
+        # 详细数据源表格
+        st.markdown("### 📊 数据源统计")
+        
+        if 'platform' in filtered_df.columns:
+            # 按平台统计
+            platform_stats = filtered_df.groupby('platform').agg({
+                'product_name': 'count',
+                'views': 'sum',
+                'sales_volume': 'sum' if 'sales_volume' in filtered_df.columns else 'count'
+            }).reset_index()
+            platform_stats.columns = ['平台', '产品数量', '总浏览量', '总销量']
+            
+            # 计算占比
+            total_products = platform_stats['产品数量'].sum()
+            total_views = platform_stats['总浏览量'].sum()
+            platform_stats['产品占比'] = (platform_stats['产品数量'] / total_products * 100).round(1).astype(str) + '%'
+            platform_stats['浏览占比'] = (platform_stats['总浏览量'] / total_views * 100).round(1).astype(str) + '%'
+            
+            # 格式化数字
+            platform_stats['总浏览量'] = platform_stats['总浏览量'].apply(lambda x: f"{x:,}")
+            platform_stats['总销量'] = platform_stats['总销量'].apply(lambda x: f"{x:,}")
+            
+            st.dataframe(platform_stats, use_container_width=True, hide_index=True)
+            
+            # 添加解释
+            st.caption("💡 表格显示了各平台的数据贡献度，帮助您了解数据来源分布")
+        
         st.divider()
         
         # 6个KPI - 动态计算
