@@ -137,6 +137,35 @@ def download_file(service, file_id):
         return None
 
 
+def load_csv_file(service, folder_id, filename):
+    """
+    从Shared Drive加载CSV文件
+    
+    Args:
+        service: Drive API服务对象
+        folder_id: 文件夹ID
+        filename: 文件名
+        
+    Returns:
+        pd.DataFrame: 数据框
+    """
+    try:
+        files = list_files_in_folder(service, folder_id)
+        
+        for file in files:
+            if file['name'] == filename:
+                content = download_file(service, file['id'])
+                if content:
+                    return pd.read_csv(io.BytesIO(content))
+        
+        print(f"File not found: {filename}")
+        return None
+        
+    except Exception as e:
+        print(f"Error loading CSV file {filename}: {e}")
+        return None
+
+
 def load_week_data(week_number: int) -> Optional[pd.DataFrame]:
     """
     从Google Drive加载指定周次的完整数据
@@ -152,69 +181,146 @@ def load_week_data(week_number: int) -> Optional[pd.DataFrame]:
         if not service:
             return None
         
-        # 直接从Shared Drive根目录查找CSV文件
-        files = list_files_in_folder(service, GDRIVE_FOLDER_ID)
         csv_filename = f"All_Data_Week_{week_number:02d}.csv"
+        df = load_csv_file(service, GDRIVE_FOLDER_ID, csv_filename)
         
-        for file in files:
-            if file['name'] == csv_filename:
-                # 下载文件
-                content = download_file(service, file['id'])
-                if content:
-                    df = pd.read_csv(io.BytesIO(content))
-                    return df
+        if df is not None:
+            # 解析JSON字段
+            if 'platforms_detail' in df.columns:
+                df['platforms_detail'] = df['platforms_detail'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
+            if 'marketplace_detail' in df.columns:
+                df['marketplace_detail'] = df['marketplace_detail'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
+            if 'emotion_distribution' in df.columns:
+                df['emotion_distribution'] = df['emotion_distribution'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
+            if 'emotion_topics' in df.columns:
+                df['emotion_topics'] = df['emotion_topics'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
         
-        print(f"CSV file not found for week {week_number}")
-        return None
+        return df
         
     except Exception as e:
         print(f"Error loading week {week_number} data: {e}")
         return None
 
 
-def load_week_metadata(week_number: int) -> Optional[Dict]:
+def load_summary_data(week_number: int) -> Optional[pd.DataFrame]:
     """
-    从Google Drive加载指定周次的元数据
+    从Google Drive加载指定周次的摘要数据
     
     Args:
         week_number: 周次编号
         
     Returns:
-        Dict: 元数据字典
+        pd.DataFrame: 摘要数据
     """
     try:
         service = get_drive_service()
         if not service:
             return None
         
-        # 查找周次文件夹
-        folders = list_files_in_folder(service, GDRIVE_FOLDER_ID)
-        week_folder_name = f"week_{week_number:02d}"
-        week_folder_id = None
-        
-        for folder in folders:
-            if folder['name'] == week_folder_name and \
-               folder['mimeType'] == 'application/vnd.google-apps.folder':
-                week_folder_id = folder['id']
-                break
-        
-        if not week_folder_id:
-            return None
-        
-        # 查找metadata.json文件
-        files = list_files_in_folder(service, week_folder_id)
-        
-        for file in files:
-            if file['name'] == 'metadata.json':
-                # 下载并解析JSON
-                content = download_file(service, file['id'])
-                if content:
-                    return json.loads(content.decode('utf-8'))
-        
-        return None
+        csv_filename = f"Summary_Week_{week_number:02d}.csv"
+        return load_csv_file(service, GDRIVE_FOLDER_ID, csv_filename)
         
     except Exception as e:
-        print(f"Error loading metadata: {e}")
+        print(f"Error loading summary data: {e}")
+        return None
+
+
+def load_platform_comparison(week_number: int) -> Optional[pd.DataFrame]:
+    """
+    从Google Drive加载指定周次的平台对比数据
+    
+    Args:
+        week_number: 周次编号
+        
+    Returns:
+        pd.DataFrame: 平台对比数据
+    """
+    try:
+        service = get_drive_service()
+        if not service:
+            return None
+        
+        csv_filename = f"Platform_Comparison_Week_{week_number:02d}.csv"
+        return load_csv_file(service, GDRIVE_FOLDER_ID, csv_filename)
+        
+    except Exception as e:
+        print(f"Error loading platform comparison: {e}")
+        return None
+
+
+def load_emotion_analysis(week_number: int) -> Optional[pd.DataFrame]:
+    """
+    从Google Drive加载指定周次的情绪分析数据
+    
+    Args:
+        week_number: 周次编号
+        
+    Returns:
+        pd.DataFrame: 情绪分析数据
+    """
+    try:
+        service = get_drive_service()
+        if not service:
+            return None
+        
+        csv_filename = f"Emotion_Analysis_Week_{week_number:02d}.csv"
+        df = load_csv_file(service, GDRIVE_FOLDER_ID, csv_filename)
+        
+        if df is not None:
+            # 解析JSON字段
+            if 'top_keywords' in df.columns:
+                df['top_keywords'] = df['top_keywords'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
+            if 'sample_comments' in df.columns:
+                df['sample_comments'] = df['sample_comments'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
+        
+        return df
+        
+    except Exception as e:
+        print(f"Error loading emotion analysis: {e}")
+        return None
+
+
+def load_topic_analysis(week_number: int) -> Optional[pd.DataFrame]:
+    """
+    从Google Drive加载指定周次的主题分析数据
+    
+    Args:
+        week_number: 周次编号
+        
+    Returns:
+        pd.DataFrame: 主题分析数据
+    """
+    try:
+        service = get_drive_service()
+        if not service:
+            return None
+        
+        csv_filename = f"Topic_Analysis_Week_{week_number:02d}.csv"
+        df = load_csv_file(service, GDRIVE_FOLDER_ID, csv_filename)
+        
+        if df is not None:
+            # 解析JSON字段
+            if 'keywords' in df.columns:
+                df['keywords'] = df['keywords'].apply(
+                    lambda x: json.loads(x) if isinstance(x, str) else x
+                )
+        
+        return df
+        
+    except Exception as e:
+        print(f"Error loading topic analysis: {e}")
         return None
 
 
@@ -266,66 +372,16 @@ def upload_week_data(csv_file, week_number: int, notes: str = "") -> bool:
         if not service:
             return False
         
-        # 创建周次文件夹
-        week_folder_name = f"week_{week_number:02d}"
-        
-        # 检查文件夹是否已存在
-        folders = list_files_in_folder(service, GDRIVE_FOLDER_ID)
-        week_folder_id = None
-        
-        for folder in folders:
-            if folder['name'] == week_folder_name and \
-               folder['mimeType'] == 'application/vnd.google-apps.folder':
-                week_folder_id = folder['id']
-                break
-        
-        # 如果不存在则创建
-        if not week_folder_id:
-            folder_metadata = {
-                'name': week_folder_name,
-                'parents': [GDRIVE_FOLDER_ID],
-                'mimeType': 'application/vnd.google-apps.folder'
-            }
-            folder = service.files().create(body=folder_metadata, fields='id', supportsAllDrives=True).execute()
-            week_folder_id = folder.get('id')
-        
         # 保存CSV到临时文件
         with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.csv') as tmp:
             tmp.write(csv_file.getbuffer())
             tmp_path = tmp.name
         
-        # 读取CSV获取统计信息
-        df = pd.read_csv(tmp_path)
-        top_products = len(df[df['product_category'] == 'Top Product'])
-        watch_products = len(df[df['product_category'] == 'Watch Product'])
-        
-        # 上传CSV文件
+        # 上传CSV文件到Shared Drive根目录
         csv_filename = f"All_Data_Week_{week_number:02d}.csv"
-        upload_file(service, tmp_path, csv_filename, week_folder_id)
+        upload_file(service, tmp_path, csv_filename, GDRIVE_FOLDER_ID)
         
         # 删除临时文件
-        os.unlink(tmp_path)
-        
-        # 创建元数据
-        metadata = {
-            "week_number": week_number,
-            "year": datetime.now().year,
-            "collection_date": datetime.now().strftime("%Y-%m-%d"),
-            "collector": "manual",
-            "data_source": "TikTok",
-            "total_products": len(df),
-            "top_products": top_products,
-            "watch_products": watch_products,
-            "keywords_used": ["3d printing", "3d printed", "3d printer"],
-            "notes": notes
-        }
-        
-        # 上传元数据
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as tmp:
-            json.dump(metadata, tmp, indent=2, ensure_ascii=False)
-            tmp_path = tmp.name
-        
-        upload_file(service, tmp_path, 'metadata.json', week_folder_id)
         os.unlink(tmp_path)
         
         return True
@@ -350,16 +406,16 @@ def get_week_summary(week_number: int) -> Dict:
     if df is None:
         return {}
     
-    metadata = load_week_metadata(week_number)
-    
     summary = {
         "week_number": week_number,
         "total_products": len(df),
-        "top_products": len(df[df['product_category'] == 'Top Product']),
-        "watch_products": len(df[df['product_category'] == 'Watch Product']),
+        "main_track_count": len(df[df['track_type'] == '主轨道']),
+        "secondary_track_count": len(df[df['track_type'] == '副轨道']),
+        "watch_count": len(df[df['track_type'] == '观察']),
         "avg_total_score": df['total_score'].mean(),
+        "avg_emotion_score": df['emotion_score'].mean(),
         "avg_engagement_rate": df['engagement_rate'].mean(),
-        "collection_date": metadata.get('collection_date', 'Unknown') if metadata else 'Unknown'
+        "collection_date": df['collection_date'].iloc[0] if 'collection_date' in df.columns else 'Unknown'
     }
     
     return summary
