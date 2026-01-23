@@ -524,9 +524,42 @@ def main():
             
             st.markdown("---")
             
-            # 显示所有推荐
-            recommendations_html = format_recommendations_html(recommendations)
-            st.markdown(recommendations_html, unsafe_allow_html=True)
+            # 显示所有推荐（使用Streamlit原生组件）
+            for i, rec in enumerate(recommendations, 1):
+                # 优先级颜色映射
+                priority_colors = {
+                    '高': '🔴',
+                    '中': '🟡',
+                    '低': '🔵'
+                }
+                priority_icon = priority_colors.get(rec['priority'], '⚪')
+                
+                # 使用container创建卡片效果
+                with st.container():
+                    # 标题行
+                    col_title, col_priority = st.columns([4, 1])
+                    with col_title:
+                        st.markdown(f"#### 推荐 {i}: {rec['category']}")
+                    with col_priority:
+                        st.markdown(f"**{priority_icon} {rec['priority']}优先级**")
+                    
+                    # 问题和建议
+                    st.markdown(f"**问题：** {rec['issue']}")
+                    st.markdown(f"**建议：** {rec['recommendation']}")
+                    
+                    # 具体行动
+                    st.markdown("**具体行动：**")
+                    for j, action in enumerate(rec['actions'], 1):
+                        st.markdown(f"   {j}. {action}")
+                    
+                    # 影响和时间线
+                    col_impact, col_timeline = st.columns(2)
+                    with col_impact:
+                        st.success(f"✓ {rec['expected_impact']}")
+                    with col_timeline:
+                        st.info(f"⏰ {rec['timeline']}")
+                    
+                    st.markdown("---")
             
             # 可展开的行动计划
             with st.expander("📋 查看分组行动计划"):
