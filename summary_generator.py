@@ -76,23 +76,41 @@ def analyze_sales_trends(df):
     
     # 按平台分析
     if 'platform' in df.columns:
-        platform_performance = df.groupby('platform').agg({
-            'views': 'sum',
-            'sales_volume': 'sum',
-            'revenue_estimate': 'sum'
-        }).sort_values('revenue_estimate', ascending=False)
+        # 构建聚合字典，只包含存在的列
+        agg_dict = {'views': 'sum'}
+        if 'sales_volume' in df.columns:
+            agg_dict['sales_volume'] = 'sum'
+        if 'revenue_estimate' in df.columns:
+            agg_dict['revenue_estimate'] = 'sum'
+        elif 'sales_estimate' in df.columns and 'price' in df.columns:
+            # 如果没有revenue_estimate，用sales_estimate * price计算
+            df['revenue_estimate'] = df['sales_estimate'] * df['price']
+            agg_dict['revenue_estimate'] = 'sum'
+        
+        platform_performance = df.groupby('platform').agg(agg_dict)
+        
+        # 根据可用的列排序
+        if 'revenue_estimate' in platform_performance.columns:
+            platform_performance = platform_performance.sort_values('revenue_estimate', ascending=False)
+        else:
+            platform_performance = platform_performance.sort_values('views', ascending=False)
         
         if not platform_performance.empty:
             top_platform = platform_performance.index[0]
             insight['top_platform'] = top_platform
-            insight['top_platform_revenue'] = platform_performance.iloc[0]['revenue_estimate']
+            if 'revenue_estimate' in platform_performance.columns:
+                insight['top_platform_revenue'] = platform_performance.iloc[0]['revenue_estimate']
     
     # 按类别分析
     if 'product_category' in df.columns:
-        category_performance = df.groupby('product_category').agg({
-            'views': 'sum',
-            'sales_volume': 'sum'
-        }).sort_values('views', ascending=False)
+        # 构建聚合字典，只包含存在的列
+        agg_dict = {'views': 'sum'}
+        if 'sales_volume' in df.columns:
+            agg_dict['sales_volume'] = 'sum'
+        elif 'sales_estimate' in df.columns:
+            agg_dict['sales_estimate'] = 'sum'
+        
+        category_performance = df.groupby('product_category').agg(agg_dict).sort_values('views', ascending=False)
         
         if not category_performance.empty:
             top_category = category_performance.index[0]
