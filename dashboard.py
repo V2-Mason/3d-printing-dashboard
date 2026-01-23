@@ -729,7 +729,7 @@ def main():
         st.download_button(
             label="📥 下载数据 (CSV)",
             data=csv,
-            file_name=f"products_{selected_week}.csv",
+            file_name=f"products_week_{selected_week_num:02d}.csv",
             mime="text/csv"
         )
     
