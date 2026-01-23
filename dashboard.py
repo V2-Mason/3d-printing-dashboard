@@ -500,8 +500,13 @@ def main():
         
         st.divider()
         
+        # 生成摘要数据（如果可用）
+        summary = None
+        if SUMMARY_GENERATOR_AVAILABLE:
+            summary = generate_dynamic_summary(filtered_df)
+        
         # 基于数据的解决方案推荐
-        if RECOMMENDATIONS_AVAILABLE and SUMMARY_GENERATOR_AVAILABLE:
+        if RECOMMENDATIONS_AVAILABLE:
             st.markdown("### 🎯 基于数据的解决方案推荐")
             
             recommendations = generate_recommendations(filtered_df, summary)
@@ -539,9 +544,8 @@ def main():
         # 三大核心洞察 - 动态生成
         st.markdown("### 💡 三大核心洞察")
         
-        # 生成动态摘要
-        if SUMMARY_GENERATOR_AVAILABLE:
-            summary = generate_dynamic_summary(filtered_df)
+        # 使用已生成的摘要
+        if SUMMARY_GENERATOR_AVAILABLE and summary:
             emotion_html, sales_html, strategy_html = format_insight_html(summary)
             
             col1, col2, col3 = st.columns(3)
