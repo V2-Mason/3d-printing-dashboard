@@ -1007,7 +1007,11 @@ def main():
         with col1:
             search_term = st.text_input("搜索产品名称", "")
         with col2:
-            sort_by = st.selectbox("排序依据", ["total_score", "views", "engagement_rate", "emotion_score"])
+            # Build sort options based on available columns
+            sort_options = ["total_score", "views", "engagement_rate"]
+            if 'emotion_score' in filtered_df.columns:
+                sort_options.append("emotion_score")
+            sort_by = st.selectbox("排序依据", sort_options)
         
         # 搜索筛选
         display_df = filtered_df.copy()
@@ -1017,20 +1021,27 @@ def main():
         # 排序
         display_df = display_df.sort_values(by=sort_by, ascending=False)
         
-        # 格式化显示列
+        # 格式化显示列 - only include columns that exist
         display_columns = {
             'product_name': '产品名称',
             'product_category': '类别',
-            'total_score': '总分',
-            'emotion_score': '情绪分',
+            'total_score': '总分'
+        }
+        
+        # Add optional columns if they exist
+        if 'emotion_score' in display_df.columns:
+            display_columns['emotion_score'] = '情绪分'
+        
+        display_columns.update({
             'views': '浏览量',
             'likes': '点赞数',
             'engagement_rate': '互动率(%)'
-        }
+        })
         
-        # 创建显示数据框
-        show_df = display_df[list(display_columns.keys())].copy()
-        show_df.columns = list(display_columns.values())
+        # 创建显示数据框 - only select columns that exist
+        available_cols = [col for col in display_columns.keys() if col in display_df.columns]
+        show_df = display_df[available_cols].copy()
+        show_df.columns = [display_columns[col] for col in available_cols]
         
         # 添加颜色标记
         def highlight_score(val):
