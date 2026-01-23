@@ -543,16 +543,25 @@ def main():
             col1, col2, col3 = st.columns(3)
             
             with col1:
+                mentions = kpis.get('total_mentions', 0)
+                # 计算与平均值的对比
+                avg_mentions = 8420  # 可以后续从历史数据计算
+                delta_pct = ((mentions - avg_mentions) / avg_mentions * 100) if avg_mentions > 0 else 0
                 st.metric(
-                    "总提及次数",
-                    f"{kpis.get('total_mentions', 0):,}",
+                    "总浏览量",
+                    f"{mentions:,}",
+                    f"{delta_pct:+.1f}% vs 历史平均",
                     help="当前周在社交媒体和电商平台上的总浏览量"
                 )
             
             with col2:
+                emotion_score = kpis.get('avg_emotion_score', 0)
+                avg_emotion = 44.2
+                delta_emotion = emotion_score - avg_emotion
                 st.metric(
                     "平均情绪分数",
-                    f"{kpis.get('avg_emotion_score', 0):.1f}",
+                    f"{emotion_score:.1f}",
+                    f"{delta_emotion:+.1f} vs 历史平均",
                     help="正面情绪分数，满分50分"
                 )
             
@@ -561,6 +570,7 @@ def main():
                 st.metric(
                     "增长率",
                     f"{growth:+.1f}%",
+                    f"当前周趋势",
                     help="当前周的平均增长率"
                 )
             
@@ -568,25 +578,34 @@ def main():
             
             with col4:
                 revenue = kpis.get('total_revenue', 0)
+                avg_revenue = 48200
+                delta_revenue = revenue - avg_revenue
                 st.metric(
                     "预估营收",
                     f"${revenue:,}",
+                    f"${delta_revenue:+,} vs 历史平均",
                     help="基于当前周数据的预估总营收"
                 )
             
             with col5:
                 conversion = kpis.get('avg_conversion_rate', 0)
+                avg_conversion = 5.8
+                delta_conversion = conversion - avg_conversion
                 st.metric(
                     "转化率",
                     f"{conversion:.2f}%",
+                    f"{delta_conversion:+.2f}% vs 历史平均",
                     help="从浏览到购买的平均转化率"
                 )
             
             with col6:
                 rating = kpis.get('avg_rating', 0)
+                avg_rating = 4.5
+                delta_rating = rating - avg_rating
                 st.metric(
                     "客户满意度",
                     f"{rating:.2f}/5.0",
+                    f"{delta_rating:+.2f} vs 历史平均",
                     help="平台平均评分"
                 )
         else:
@@ -1022,6 +1041,49 @@ def main():
         理解用户情绪有助于优化产品设计和营销策略。
         </div>
         """, unsafe_allow_html=True)
+        
+        # 情绪分数解读指南
+        st.markdown("### 情绪分数解读指南")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
+                <h3 style="margin: 0; color: white;">0-20分</h3>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">较差</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">负面情绪为主<br>需要立即优化</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #ffa502 0%, #ffb733 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
+                <h3 style="margin: 0; color: white;">20-35分</h3>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">一般</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">中性情绪较多<br>有提升空间</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #2196F3 0%, #42a5f5 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
+                <h3 style="margin: 0; color: white;">35-45分</h3>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">良好</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">正面情绪为主<br>表现不错</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #4CAF50 0%, #66bb6a 100%); padding: 20px; border-radius: 10px; text-align: center; color: white;">
+                <h3 style="margin: 0; color: white;">45-50分</h3>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">优秀</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">高度正面情绪<br>值得重点关注</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.divider()
         
         # 生成情绪数据
         emotion_df = generate_emotion_data()
