@@ -1156,8 +1156,9 @@ def main():
             st.divider()
             
             # TikTok链接
-            st.markdown(f"#### 查看原视频")
-            st.markdown(f"[点击访问TikTok视频]({product_data['tiktok_url']})")
+            if 'tiktok_url' in product_data.index and pd.notna(product_data['tiktok_url']):
+                st.markdown(f"#### 查看原视频")
+                st.markdown(f"[点击访閮TikTok视频]({product_data['tiktok_url']})")
         else:
             st.info("请在侧边栏启用 '显示AI分析' 选项")
     

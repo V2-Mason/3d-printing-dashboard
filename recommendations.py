@@ -197,8 +197,8 @@ def format_recommendations_html(recommendations):
             <p style="margin: 5px 0 10px 0; color: #666; line-height: 1.8;">{actions_html}</p>
             
             <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                <span style="color: #4CAF50; font-size: 14px;">📈 {rec['expected_impact']}</span>
-                <span style="color: #2196F3; font-size: 14px;">⏱️ {rec['timeline']}</span>
+                <span style="color: #4CAF50; font-size: 14px;">✓ {rec['expected_impact']}</span>
+                <span style="color: #2196F3; font-size: 14px;">⏰ {rec['timeline']}</span>
             </div>
         </div>
         """
