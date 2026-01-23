@@ -16,7 +16,7 @@ import io
 import tempfile
 
 # Google Drive Shared Drive ID and Folder ID
-GDRIVE_ID = "0AJM-v7YxYxbsUk9PVA"  # Shared Drive ID
+GDRIVE_ID = "0AFBJflVvo6P2Uk9PVA"  # Shared Drive ID
 GDRIVE_FOLDER_ID = "1wv8bJxCTQdmGJ3BoKNKMVYnlNPvzLTrR"  # Folder ID where CSV files are stored
 
 
@@ -29,8 +29,8 @@ def get_drive_service():
     """
     try:
         # 从Streamlit secrets读取服务账号凭证
-        if hasattr(st, 'secrets') and 'gcp_service_account' in st.secrets:
-            credentials_dict = dict(st.secrets['gcp_service_account'])
+        if hasattr(st, 'secrets') and 'gdrive' in st.secrets:
+            credentials_dict = dict(st.secrets['gdrive'])
         else:
             # 本地开发时从环境变量读取
             credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
