@@ -17,7 +17,7 @@ import tempfile
 
 # Google Drive Shared Drive ID and Folder ID
 GDRIVE_ID = "0AFBJflVvo6P2Uk9PVA"  # Shared Drive ID
-GDRIVE_FOLDER_ID = "1wv8bJxCTQdmGJ3BoKNKMVYnlNPvzLTrR"  # Folder ID where CSV files are stored
+GDRIVE_FOLDER_ID = "0AFBJflVvo6P2Uk9PVA"  # Folder ID where CSV files are stored (same as DRIVE_ID since files are in root)
 
 
 def get_drive_service():
