@@ -69,6 +69,17 @@ try:
 except ImportError:
     EMOTION_VIZ_AVAILABLE = False
 
+# Import recommendations engine
+try:
+    from recommendations import (
+        generate_recommendations,
+        format_recommendations_html,
+        create_action_priority_matrix
+    )
+    RECOMMENDATIONS_AVAILABLE = True
+except ImportError:
+    RECOMMENDATIONS_AVAILABLE = False
+
 # 页面配置
 st.set_page_config(
     page_title="3D打印市场情报仪表板",
@@ -486,6 +497,42 @@ def main():
         助力3D打印定制业务实现数据驱动的产品选择和市场策略。
         </div>
         """, unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # 基于数据的解决方案推荐
+        if RECOMMENDATIONS_AVAILABLE and SUMMARY_GENERATOR_AVAILABLE:
+            st.markdown("### 🎯 基于数据的解决方案推荐")
+            
+            recommendations = generate_recommendations(filtered_df, summary)
+            
+            # 显示推荐数量
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("总推荐数", len(recommendations))
+            with col2:
+                high_priority = len([r for r in recommendations if r['priority'] == '高'])
+                st.metric("高优先级", high_priority, delta="立即执行")
+            with col3:
+                mid_priority = len([r for r in recommendations if r['priority'] == '中'])
+                st.metric("中优先级", mid_priority, delta="近期规划")
+            
+            st.markdown("---")
+            
+            # 显示所有推荐
+            recommendations_html = format_recommendations_html(recommendations)
+            st.markdown(recommendations_html, unsafe_allow_html=True)
+            
+            # 可展开的行动计划
+            with st.expander("📋 查看分组行动计划"):
+                action_matrix = create_action_priority_matrix(recommendations)
+                
+                for category, recs in action_matrix.items():
+                    if recs:
+                        st.markdown(f"#### {category}")
+                        for rec in recs:
+                            st.markdown(f"- **{rec['category']}**: {rec['recommendation']}")
+                        st.markdown("")
         
         st.divider()
         
