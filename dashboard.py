@@ -289,6 +289,14 @@ def main():
         
         # 数据源选择 - 使用Google Drive
         if DATA_MANAGER_AVAILABLE:
+            # 添加刷新按钮
+            col1, col2 = st.columns([3, 1])
+            with col2:
+                if st.button("🔄 刷新", help="检测新上传的数据"):
+                    # 清除缓存
+                    st.cache_data.clear()
+                    st.rerun()
+            
             available_weeks = get_available_weeks()
             if not available_weeks:
                 st.error("未找到数据！请上传数据文件")
