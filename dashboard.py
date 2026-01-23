@@ -1113,21 +1113,45 @@ def main():
             st.divider()
             
             # AI分析内容
-            col1, col2 = st.columns(2)
+            # 检查是否有AI字段
+            has_ai_fields = all(field in product_data.index for field in [
+                'ai_market_positioning', 'ai_pricing_strategy', 
+                'ai_target_audience', 'ai_risks'
+            ])
             
-            with col1:
-                st.markdown("#### 市场定位")
-                st.info(product_data['ai_market_positioning'])
+            if has_ai_fields:
+                col1, col2 = st.columns(2)
                 
-                st.markdown("#### 定价策略")
-                st.success(product_data['ai_pricing_strategy'])
-            
-            with col2:
-                st.markdown("#### 👥 目标受众")
-                st.info(product_data['ai_target_audience'])
+                with col1:
+                    st.markdown("#### 市场定位")
+                    st.info(product_data['ai_market_positioning'])
+                    
+                    st.markdown("#### 定价策略")
+                    st.success(product_data['ai_pricing_strategy'])
                 
-                st.markdown("#### ⚠️ 风险评估")
-                st.warning(product_data['ai_risks'])
+                with col2:
+                    st.markdown("#### 👥 目标受众")
+                    st.info(product_data['ai_target_audience'])
+                    
+                    st.markdown("#### ⚠️ 风险评估")
+                    st.warning(product_data['ai_risks'])
+            else:
+                st.info("💡 AI分析功能即将推出！当前数据文件中暂无AI生成的分析内容。")
+                st.markdown("""  
+                **可用的产品信息：**
+                """)
+                
+                # 显示可用的产品数据
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    if 'emotion_score' in product_data.index:
+                        st.metric("情绪得分", f"{product_data['emotion_score']:.2f}")
+                with col2:
+                    if 'sales_score' in product_data.index:
+                        st.metric("销售得分", f"{product_data['sales_score']:.2f}")
+                with col3:
+                    if 'total_score' in product_data.index:
+                        st.metric("综合得分", f"{product_data['total_score']:.2f}")
             
             st.divider()
             
