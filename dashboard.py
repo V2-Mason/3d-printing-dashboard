@@ -682,7 +682,7 @@ def main():
         with col1:
             search_term = st.text_input("🔍 搜索产品名称", "")
         with col2:
-            sort_by = st.selectbox("排序依据", ["product_rank", "total_score", "views", "engagement_rate"])
+            sort_by = st.selectbox("排序依据", ["total_score", "views", "engagement_rate", "emotion_score"])
         
         # 搜索筛选
         display_df = filtered_df.copy()
@@ -690,18 +690,17 @@ def main():
             display_df = display_df[display_df['product_name'].str.contains(search_term, case=False, na=False)]
         
         # 排序
-        display_df = display_df.sort_values(by=sort_by, ascending=(sort_by == 'product_rank'))
+        display_df = display_df.sort_values(by=sort_by, ascending=False)
         
         # 格式化显示列
         display_columns = {
-            'product_rank': '排名',
             'product_name': '产品名称',
             'product_category': '类别',
             'total_score': '总分',
+            'emotion_score': '情绪分',
             'views': '浏览量',
             'likes': '点赞数',
-            'engagement_rate': '互动率(%)',
-            'tiktok_url': 'TikTok链接'
+            'engagement_rate': '互动率(%)'
         }
         
         # 创建显示数据框
