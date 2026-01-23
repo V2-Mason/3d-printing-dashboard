@@ -1,6 +1,6 @@
 """
-数据管理模块 - Google Drive API集成
-用于管理周次数据的上传、下载和列表（使用PyDrive2）
+数据管理模块 - Google Drive API v3集成
+用于管理周次数据的上传、下载和列表
 """
 
 import os
@@ -9,21 +9,22 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 from typing import List, Dict, Optional
-from pydrive2.auth import GoogleAuth
-from pydrive2.drive import GoogleDrive
 from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+import io
 import tempfile
 
-# Google Drive文件夹ID（从环境变量或Streamlit secrets读取）
-GDRIVE_FOLDER_ID = "1icAQPPsktP-7IeHhjk9QxVKCvYfGq3T6"
+# Google Drive Shared Drive ID
+GDRIVE_FOLDER_ID = "0AFBJflVvo6P2Uk9PVA"
 
 
-def get_drive_client():
+def get_drive_service():
     """
-    创建Google Drive客户端
+    创建Google Drive API服务
     
     Returns:
-        GoogleDrive: Drive客户端对象
+        Resource: Drive API服务对象
     """
     try:
         # 从Streamlit secrets读取服务账号凭证
@@ -43,25 +44,21 @@ def get_drive_client():
             scopes=['https://www.googleapis.com/auth/drive']
         )
         
-        # 创建GoogleAuth对象
-        gauth = GoogleAuth()
-        gauth.credentials = credentials
-        
-        # 创建Drive客户端
-        drive = GoogleDrive(gauth)
-        return drive
+        # 创建Drive API服务
+        service = build('drive', 'v3', credentials=credentials)
+        return service
         
     except Exception as e:
-        st.error(f"Failed to create Drive client: {e}")
+        print(f"Failed to create Drive service: {e}")
         return None
 
 
-def list_files_in_folder(drive, folder_id):
+def list_files_in_folder(service, folder_id):
     """
     列出文件夹中的所有文件
     
     Args:
-        drive: GoogleDrive客户端
+        service: Drive API服务对象
         folder_id: 文件夹ID
         
     Returns:
@@ -69,8 +66,13 @@ def list_files_in_folder(drive, folder_id):
     """
     try:
         query = f"'{folder_id}' in parents and trashed=false"
-        file_list = drive.ListFile({'q': query}).GetList()
-        return file_list
+        results = service.files().list(
+            q=query,
+            fields="files(id, name, mimeType)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
+        ).execute()
+        return results.get('files', [])
     except Exception as e:
         print(f"Error listing files: {e}")
         return []
@@ -84,29 +86,55 @@ def get_available_weeks() -> List[int]:
         List[int]: 周次编号列表
     """
     try:
-        drive = get_drive_client()
-        if not drive:
+        service = get_drive_service()
+        if not service:
             return [4]  # 默认返回第4周
         
-        # 列出主文件夹中的所有子文件夹
-        folders = list_files_in_folder(drive, GDRIVE_FOLDER_ID)
+        # 直接从Shared Drive根目录列出CSV文件
+        files = list_files_in_folder(service, GDRIVE_FOLDER_ID)
         
         weeks = []
-        for folder in folders:
-            if folder['mimeType'] == 'application/vnd.google-apps.folder':
-                folder_name = folder['title']
-                if folder_name.startswith('week_'):
-                    try:
-                        week_num = int(folder_name.split('_')[1])
+        for file in files:
+            if file['name'].startswith('All_Data_Week_') and file['name'].endswith('.csv'):
+                try:
+                    import re
+                    match = re.search(r'Week_(\d+)', file['name'])
+                    if match:
+                        week_num = int(match.group(1))
                         weeks.append(week_num)
-                    except (IndexError, ValueError):
-                        continue
+                except (IndexError, ValueError):
+                    continue
         
         return sorted(weeks) if weeks else [4]
         
     except Exception as e:
         print(f"Error getting available weeks: {e}")
         return [4]
+
+
+def download_file(service, file_id):
+    """
+    下载文件内容
+    
+    Args:
+        service: Drive API服务对象
+        file_id: 文件ID
+        
+    Returns:
+        bytes: 文件内容
+    """
+    try:
+        request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+        file_content = io.BytesIO()
+        downloader = MediaIoBaseDownload(file_content, request)
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
+        file_content.seek(0)
+        return file_content.read()
+    except Exception as e:
+        print(f"Error downloading file: {e}")
+        return None
 
 
 def load_week_data(week_number: int) -> Optional[pd.DataFrame]:
@@ -120,36 +148,20 @@ def load_week_data(week_number: int) -> Optional[pd.DataFrame]:
         pd.DataFrame: 产品数据
     """
     try:
-        drive = get_drive_client()
-        if not drive:
+        service = get_drive_service()
+        if not service:
             return None
         
-        # 查找周次文件夹
-        folders = list_files_in_folder(drive, GDRIVE_FOLDER_ID)
-        week_folder_name = f"week_{week_number:02d}"
-        week_folder_id = None
-        
-        for folder in folders:
-            if folder['title'] == week_folder_name and \
-               folder['mimeType'] == 'application/vnd.google-apps.folder':
-                week_folder_id = folder['id']
-                break
-        
-        if not week_folder_id:
-            print(f"Week {week_number} folder not found")
-            return None
-        
-        # 查找CSV文件
-        files = list_files_in_folder(drive, week_folder_id)
+        # 直接从Shared Drive根目录查找CSV文件
+        files = list_files_in_folder(service, GDRIVE_FOLDER_ID)
         csv_filename = f"All_Data_Week_{week_number:02d}.csv"
         
         for file in files:
-            if file['title'] == csv_filename:
-                # 下载文件到临时目录
-                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.csv') as tmp:
-                    file.GetContentFile(tmp.name)
-                    df = pd.read_csv(tmp.name)
-                    os.unlink(tmp.name)
+            if file['name'] == csv_filename:
+                # 下载文件
+                content = download_file(service, file['id'])
+                if content:
+                    df = pd.read_csv(io.BytesIO(content))
                     return df
         
         print(f"CSV file not found for week {week_number}")
@@ -171,17 +183,17 @@ def load_week_metadata(week_number: int) -> Optional[Dict]:
         Dict: 元数据字典
     """
     try:
-        drive = get_drive_client()
-        if not drive:
+        service = get_drive_service()
+        if not service:
             return None
         
         # 查找周次文件夹
-        folders = list_files_in_folder(drive, GDRIVE_FOLDER_ID)
+        folders = list_files_in_folder(service, GDRIVE_FOLDER_ID)
         week_folder_name = f"week_{week_number:02d}"
         week_folder_id = None
         
         for folder in folders:
-            if folder['title'] == week_folder_name and \
+            if folder['name'] == week_folder_name and \
                folder['mimeType'] == 'application/vnd.google-apps.folder':
                 week_folder_id = folder['id']
                 break
@@ -190,18 +202,50 @@ def load_week_metadata(week_number: int) -> Optional[Dict]:
             return None
         
         # 查找metadata.json文件
-        files = list_files_in_folder(drive, week_folder_id)
+        files = list_files_in_folder(service, week_folder_id)
         
         for file in files:
-            if file['title'] == 'metadata.json':
+            if file['name'] == 'metadata.json':
                 # 下载并解析JSON
-                content = file.GetContentString()
-                return json.loads(content)
+                content = download_file(service, file['id'])
+                if content:
+                    return json.loads(content.decode('utf-8'))
         
         return None
         
     except Exception as e:
         print(f"Error loading metadata: {e}")
+        return None
+
+
+def upload_file(service, file_path, filename, folder_id):
+    """
+    上传文件到Google Drive
+    
+    Args:
+        service: Drive API服务对象
+        file_path: 本地文件路径
+        filename: 目标文件名
+        folder_id: 目标文件夹ID
+        
+    Returns:
+        str: 上传后的文件ID
+    """
+    try:
+        file_metadata = {
+            'name': filename,
+            'parents': [folder_id]
+        }
+        media = MediaFileUpload(file_path, resumable=True)
+        file = service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        return file.get('id')
+    except Exception as e:
+        print(f"Error uploading file: {e}")
         return None
 
 
@@ -218,19 +262,19 @@ def upload_week_data(csv_file, week_number: int, notes: str = "") -> bool:
         bool: 上传是否成功
     """
     try:
-        drive = get_drive_client()
-        if not drive:
+        service = get_drive_service()
+        if not service:
             return False
         
         # 创建周次文件夹
         week_folder_name = f"week_{week_number:02d}"
         
         # 检查文件夹是否已存在
-        folders = list_files_in_folder(drive, GDRIVE_FOLDER_ID)
+        folders = list_files_in_folder(service, GDRIVE_FOLDER_ID)
         week_folder_id = None
         
         for folder in folders:
-            if folder['title'] == week_folder_name and \
+            if folder['name'] == week_folder_name and \
                folder['mimeType'] == 'application/vnd.google-apps.folder':
                 week_folder_id = folder['id']
                 break
@@ -238,13 +282,12 @@ def upload_week_data(csv_file, week_number: int, notes: str = "") -> bool:
         # 如果不存在则创建
         if not week_folder_id:
             folder_metadata = {
-                'title': week_folder_name,
-                'parents': [{'id': GDRIVE_FOLDER_ID}],
+                'name': week_folder_name,
+                'parents': [GDRIVE_FOLDER_ID],
                 'mimeType': 'application/vnd.google-apps.folder'
             }
-            folder = drive.CreateFile(folder_metadata)
-            folder.Upload()
-            week_folder_id = folder['id']
+            folder = service.files().create(body=folder_metadata, fields='id', supportsAllDrives=True).execute()
+            week_folder_id = folder.get('id')
         
         # 保存CSV到临时文件
         with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.csv') as tmp:
@@ -258,13 +301,7 @@ def upload_week_data(csv_file, week_number: int, notes: str = "") -> bool:
         
         # 上传CSV文件
         csv_filename = f"All_Data_Week_{week_number:02d}.csv"
-        file_metadata = {
-            'title': csv_filename,
-            'parents': [{'id': week_folder_id}]
-        }
-        file = drive.CreateFile(file_metadata)
-        file.SetContentFile(tmp_path)
-        file.Upload()
+        upload_file(service, tmp_path, csv_filename, week_folder_id)
         
         # 删除临时文件
         os.unlink(tmp_path)
@@ -284,12 +321,12 @@ def upload_week_data(csv_file, week_number: int, notes: str = "") -> bool:
         }
         
         # 上传元数据
-        metadata_file = drive.CreateFile({
-            'title': 'metadata.json',
-            'parents': [{'id': week_folder_id}]
-        })
-        metadata_file.SetContentString(json.dumps(metadata, indent=2, ensure_ascii=False))
-        metadata_file.Upload()
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as tmp:
+            json.dump(metadata, tmp, indent=2, ensure_ascii=False)
+            tmp_path = tmp.name
+        
+        upload_file(service, tmp_path, 'metadata.json', week_folder_id)
+        os.unlink(tmp_path)
         
         return True
         
