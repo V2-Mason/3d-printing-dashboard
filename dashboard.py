@@ -13,6 +13,35 @@ from pathlib import Path
 import glob
 from datetime import datetime
 import numpy as np
+import subprocess
+import os
+
+# Auto-sync data from Google Drive on startup
+@st.cache_resource
+def sync_data_from_gdrive():
+    """Sync data from Google Drive to local reports directory"""
+    reports_dir = Path('reports')
+    reports_dir.mkdir(exist_ok=True)
+    
+    rclone_config = Path.home() / '.gdrive-rclone.ini'
+    if not rclone_config.exists():
+        return False
+    
+    try:
+        cmd = [
+            'rclone', 'copy',
+            'manus_google_drive:Market Intelligence Data/',
+            str(reports_dir),
+            '--config', str(rclone_config),
+            '--include', '*.csv'
+        ]
+        result = subprocess.run(cmd, capture_output=True, timeout=60)
+        return result.returncode == 0
+    except:
+        return False
+
+# Run sync on startup
+sync_data_from_gdrive()
 
 # Import data manager for Google Drive integration
 try:
@@ -27,7 +56,6 @@ try:
     DATA_MANAGER_AVAILABLE = True
 except ImportError:
     DATA_MANAGER_AVAILABLE = False
-    st.warning("⚠️ data_manager_gdrive.py 未找到，使用本地文件")
 
 # Import custom emotion charts module
 try:
