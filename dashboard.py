@@ -311,12 +311,34 @@ def refresh_data():
     """刷新数据：运行数据收集和上传流程"""
     with st.spinner("🚀 正在收集最新市场数据..."):
         try:
-            # 运行collector.py
-            collector_path = "/home/ubuntu/skills/market-intelligence/collector.py"
+            # 尝试多个可能的路径
+            possible_paths = [
+                "/home/ubuntu/skills/market-intelligence/collector.py",  # 本地环境
+                "./skills/market-intelligence/collector.py",  # Streamlit Cloud相对路径
+                "skills/market-intelligence/collector.py",  # 相对路径无./
+                os.path.join(os.getcwd(), "skills/market-intelligence/collector.py"),  # 当前目录
+            ]
             
-            if not os.path.exists(collector_path):
+            collector_path = None
+            for path in possible_paths:
+                if os.path.exists(path):
+                    collector_path = path
+                    break
+            
+            if not collector_path:
                 st.error("❌ 找不到数据收集脚本！")
-                st.info(f"预期路径：{collector_path}")
+                st.info("📁 尝试过的路径：")
+                for path in possible_paths:
+                    st.text(f"  - {path}")
+                st.info(f"📌 当前工作目录：{os.getcwd()}")
+                
+                # 显示当前目录结构
+                try:
+                    st.info("📂 当前目录文件：")
+                    files = os.listdir(".")
+                    st.text("\n".join([f"  - {f}" for f in files[:20]]))
+                except:
+                    pass
                 return
             
             # 运行数据收集
