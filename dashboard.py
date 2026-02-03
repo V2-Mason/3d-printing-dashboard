@@ -30,7 +30,7 @@ def sync_data_from_gdrive():
     try:
         cmd = [
             'rclone', 'copy',
-            'manus_google_drive:Market Intelligence Data/',
+            'manus_google_drive,drive_id=0AFBJflVvo6P2Uk9PVA:',
             str(reports_dir),
             '--config', str(rclone_config),
             '--include', '*.csv'
@@ -300,16 +300,76 @@ def generate_competitor_data():
 
 def format_number(num):
     """格式化数字显示"""
-    if num >= 1_000_000:
-        return f"{num/1_000_000:.1f}M"
-    elif num >= 1_000:
-        return f"{num/1_000:.1f}K"
+    if num >= 1000000:
+        return f"{num/1000000:.1f}M"
+    elif num >= 1000:
+        return f"{num/1000:.1f}K"
     else:
         return f"{num:.0f}"
 
+def refresh_data():
+    """刷新数据：运行数据收集和上传流程"""
+    with st.spinner("🚀 正在收集最新市场数据..."):
+        try:
+            # 运行collector.py
+            collector_path = "/home/ubuntu/skills/market-intelligence/collector.py"
+            
+            if not os.path.exists(collector_path):
+                st.error("❌ 找不到数据收集脚本！")
+                st.info(f"预期路径：{collector_path}")
+                return
+            
+            # 运行数据收集
+            result = subprocess.run(
+                ["python3", collector_path],
+                capture_output=True,
+                text=True,
+                timeout=300  # 5分钟超时
+            )
+            
+            if result.returncode == 0:
+                st.success("✅ 数据收集完成！")
+                
+                # 显示收集结果
+                output_lines = result.stdout.split("\n")
+                week_line = [line for line in output_lines if "周" in line or "Week" in line]
+                if week_line:
+                    st.info(week_line[-1])
+                
+                # 显示成功信息
+                st.balloons()
+                st.success("🎉 数据已上传到Google Drive！")
+                st.info("🔄 请等待2-3分钟后刷新页面查看最新数据")
+                
+                # 显示详细输出（可折叠）
+                with st.expander("📊 查看详细输出"):
+                    st.code(result.stdout, language="text")
+            else:
+                st.error("❌ 数据收集失败！")
+                st.error(f"错误信息：{result.stderr}")
+                
+                # 显示详细错误
+                with st.expander("🔍 查看错误详情"):
+                    st.code(result.stderr, language="text")
+                    if result.stdout:
+                        st.code(result.stdout, language="text")
+                
+        except subprocess.TimeoutExpired:
+            st.error("❌ 数据收集超时（5分钟）")
+            st.info("💡 请稍后再试或手动运行收集脚本")
+        except Exception as e:
+            st.error(f"❌ 发生错误：{str(e)}")
+            st.info("💡 请检查系统配置或联系管理员")
+
 def main():
-    # 标题
-    st.markdown('<div class="main-header">🖨️ 3D打印市场情报仪表板</div>', unsafe_allow_html=True)
+    # 标题和刷新按钮
+    col_title, col_button = st.columns([4, 1])
+    with col_title:
+        st.markdown('<div class="main-header">🖨️ 3D打印市场情报仪表板</div>', unsafe_allow_html=True)
+    with col_button:
+        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)  # 垂直对齐
+        if st.button("🔄 刷新数据", key="refresh_data_btn", help="收集最新一周的市场数据并上传到Google Drive"):
+            refresh_data()
     
     # 侧边栏
     with st.sidebar:
