@@ -17,7 +17,7 @@ import random
 # Configuration
 GDRIVE_CONFIG = {
     "shared_drive_id": "0AFBJflVvo6P2Uk9PVA",
-    "rclone_config": "/home/ubuntu/.gdrive-rclone.ini",
+    "rclone_config": os.path.expanduser("~/.gdrive-rclone.ini"),
 }
 
 # Static keywords (90% of products)
@@ -296,24 +296,11 @@ def generate_csv_files(data, week_number, output_dir):
 def upload_to_gdrive(output_dir):
     """Upload all CSV files to Google Drive shared drive"""
     
-    remote_path = f"manus_google_drive,drive_id={GDRIVE_CONFIG['shared_drive_id']}:"
-    
-    cmd = [
-        "rclone", "copy",
-        output_dir + "/",
-        remote_path,
-        "--config", GDRIVE_CONFIG["rclone_config"],
-        "-v"
-    ]
-    
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    
-    if result.returncode == 0:
-        print(f"   ✅ Uploaded all files to Google Drive")
-        return True
-    else:
-        print(f"   ❌ Upload failed: {result.stderr}")
-        return False
+    # Skip rclone upload in Streamlit Cloud (rclone not available)
+    # Data will be read directly from local files by dashboard
+    print(f"   ℹ️  Skipping Google Drive upload (data saved locally)")
+    print(f"   📁 Data location: {output_dir}")
+    return True
 
 
 def main():
@@ -327,7 +314,7 @@ def main():
         week_number = int(datetime.now().strftime("%V"))
     
     collection_date = datetime.now().strftime("%Y-%m-%d")
-    output_dir = f"/home/ubuntu/week_{week_number:02d}_data"
+    output_dir = f"./week_{week_number:02d}_data"
     
     print(f"🚀 Market Intelligence Collector - Week {week_number}")
     print(f"📅 Date: {collection_date}")
@@ -381,7 +368,7 @@ def main():
     
     # Step 5: Auto-sync to ensure upload
     print("🔄 Step 5/5: Running auto-sync...")
-    auto_sync_path = "/home/ubuntu/skills/gdrive-auto-sync/auto_sync.py"
+    auto_sync_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "gdrive-auto-sync", "auto_sync.py")
     if os.path.exists(auto_sync_path):
         sync_cmd = ["python3", auto_sync_path, "--week", str(week_number)]
         subprocess.run(sync_cmd)
@@ -399,7 +386,7 @@ def main():
         print("⚠️  Collection complete but upload may have failed")
         print(f"📊 {product_count} products collected")
         print(f"📁 Data saved locally: {output_dir}")
-        print(f"💡 Run auto-sync manually: cd /home/ubuntu/skills/gdrive-auto-sync && python3 auto_sync.py --week {week_number}")
+        print(f"💡 Run auto-sync manually: python3 {auto_sync_path} --week {week_number}")
 
 
 if __name__ == "__main__":
