@@ -15,6 +15,7 @@ from datetime import datetime
 import numpy as np
 import subprocess
 import os
+import sys
 
 # Auto-sync data from Google Drive on startup
 @st.cache_resource
@@ -341,9 +342,9 @@ def refresh_data():
                     pass
                 return
             
-            # 运行数据收集
+            # 运行数据收集（使用sys.executable确保使用正确的Python环境）
             result = subprocess.run(
-                ["python3", collector_path],
+                [sys.executable, collector_path],
                 capture_output=True,
                 text=True,
                 timeout=300  # 5分钟超时
